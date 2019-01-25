@@ -19,6 +19,7 @@ import io.swagger.models.ModelImpl
 import io.swagger.models.Operation
 import io.swagger.models.RefModel
 import io.swagger.models.ArrayModel
+import io.swagger.models.Model
 import io.swagger.models.Swagger
 import io.swagger.models.parameters.BodyParameter
 import io.swagger.models.parameters.Parameter
@@ -93,18 +94,18 @@ class KotlinApiBuilder(
   }
 
   fun generateFiles() {
-    StorageUtils.generateFiles(
-      proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName, apiInterfaceTypeSpec)
+    /*StorageUtils.generateFiles(
+      proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName, apiInterfaceTypeSpec)*/
 
     for (typeSpec in responseBodyModelListTypeSpec) {
       StorageUtils.generateFiles(
         proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName, typeSpec)
     }
 
-    for (typeSpec in enumListTypeSpec) {
+    /*for (typeSpec in enumListTypeSpec) {
       StorageUtils.generateFiles(
         proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName, typeSpec)
-    }
+    }*/
   }
 
   private fun createEnumClasses() {
@@ -165,7 +166,22 @@ class KotlinApiBuilder(
     val classNameList = ArrayList<String>()
 
     if (swaggerModel.definitions != null && !swaggerModel.definitions.isEmpty()) {
-      for (definition in swaggerModel.definitions) {
+
+      val defs = arrayListOf<String>()
+      val models = mutableMapOf<String, Model>()
+
+      defs.add("SyncData")
+      var i = 0
+      while (i < defs.size) {
+        val name = defs[i]
+        val definition = findDefinition(name)
+        models[name] = definition
+        findRefs(definition, defs)
+        i++
+      }
+
+      //for (definition in swaggerModel.definitions) {
+      for (definition in models) {
 
         var modelClassTypeSpec: TypeSpec.Builder
         try {
@@ -197,6 +213,27 @@ class KotlinApiBuilder(
     }
 
     return classNameList
+  }
+
+  private fun findDefinition(name: String): Model {
+    return swaggerModel.definitions[name] ?: throw IllegalArgumentException()
+  }
+
+  private fun findRefs(model: Model, types: ArrayList<String>) {
+    model.properties.forEach { _, property ->
+      if (property.type == REF_SWAGGER_TYPE) {
+        val ref = (property as RefProperty).simpleRef
+        if (!types.contains(ref)) types.add(ref)
+      }
+      if (property.type == ARRAY_SWAGGER_TYPE) {
+        val arrayProperty = property as ArrayProperty
+        val items = arrayProperty.items
+        if (items is RefProperty) {
+          val ref = items.simpleRef
+          if (!types.contains(ref)) types.add(ref)
+        }
+      }
+    }
   }
 
   private fun createApiRetrofitInterface(classNameList: List<String>): TypeSpec {

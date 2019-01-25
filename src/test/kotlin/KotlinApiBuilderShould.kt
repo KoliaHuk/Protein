@@ -36,6 +36,15 @@ class KotlinApiBuilderShould {
       ConfigurationForTests.SWAGGER_FILE_PET_STORE
   )
 
+  private val juvoSchemaProteinConfig = ProteinApiConfiguration(
+    "",
+    "https://api.weinand.it:5002/swagger/v1/swagger.json",
+    ConfigurationForTests.PACKAGE_NAME,
+    ConfigurationForTests.COMPONENT_NAME,
+    ConfigurationForTests.MODULE_NAME,
+    ConfigurationForTests.SWAGGER_FILE_PET_STORE
+  )
+
   private val consoleLogTracking = ConsoleLogTracking()
 
   @Test
@@ -98,5 +107,14 @@ class KotlinApiBuilderShould {
     assertEquals("",
         PET_STORE_INTERFACE_MOCK,
         kotlinApiBuilder.getGeneratedApiInterfaceString())
+  }
+
+  @Test
+  fun createInterfaceIfJuvoSchemaFileProvided() {
+    val kotlinApiBuilder = KotlinApiBuilder(juvoSchemaProteinConfig, consoleLogTracking)
+    kotlinApiBuilder.build()
+    assertEquals("",
+      "",
+      kotlinApiBuilder.getGeneratedApiInterfaceString())
   }
 }
