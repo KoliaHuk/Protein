@@ -109,8 +109,8 @@ public class PackageInfoStep extends WizardStep<AddComponentWizardModel> {
 
     private boolean canFinish() {
         return !"".equals(this.componentNameTextField.getText())
-                && !"".equals(this.domainTextField.getText())
-                && !"".equals(this.swaggerUrlTextField.getText());
+            && !"".equals(this.domainTextField.getText())
+            && !"".equals(this.swaggerUrlTextField.getText());
     }
 
     private void saveSettings() {
@@ -127,12 +127,12 @@ public class PackageInfoStep extends WizardStep<AddComponentWizardModel> {
 
     private void buildKotlinApi() {
         ProteinApiConfiguration configuration = new ProteinApiConfiguration(
-                this.serviceEndPointTextField.getText(),
-                this.swaggerUrlTextField.getText(),
-                Settings.getInstance().getPackageName(),
-                toFirstUpperCase(this.componentNameTextField.getText()),
-                Settings.getInstance().getModuleName(),
-                ""
+            this.serviceEndPointTextField.getText(),
+            this.swaggerUrlTextField.getText(),
+            Settings.getInstance().getPackageName(),
+            toFirstUpperCase(this.componentNameTextField.getText()),
+            Settings.getInstance().getModuleName(),
+            ""
         );
         KotlinApiBuilder kotlinApiBuilder = new KotlinApiBuilder(configuration, errorTracking);
         kotlinApiBuilder.build();

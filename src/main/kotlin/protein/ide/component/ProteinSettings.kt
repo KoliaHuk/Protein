@@ -9,17 +9,17 @@ import org.jetbrains.annotations.Nullable
 
 @State(name = "ProteinSettings", storages = [(Storage("\$APP_CONFIG$/protein.xml"))])
 class ProteinSettings : PersistentStateComponent<ProteinSettings> {
-  var version: String? = null
+    var version: String? = null
 
-  @Nullable
-  override fun getState() = this
+    @Nullable
+    override fun getState() = this
 
-  override fun loadState(state: ProteinSettings) {
-    copyBean(state, this)
-  }
+    override fun loadState(state: ProteinSettings) {
+        copyBean(state, this)
+    }
 
-  companion object {
-    val instance: ProteinSettings
-      get() = getService(ProteinSettings::class.java)
-  }
+    companion object {
+        val instance: ProteinSettings
+            get() = getService(ProteinSettings::class.java)
+    }
 }

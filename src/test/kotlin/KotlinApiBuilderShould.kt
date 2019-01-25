@@ -9,112 +9,112 @@ import tracking.ConsoleLogTracking
 
 class KotlinApiBuilderShould {
 
-  private val favoritesSchemaProteinConfig = ProteinApiConfiguration(
-      ConfigurationForTests.SERVICE_ENDPOINT,
-      "",
-      ConfigurationForTests.PACKAGE_NAME,
-      ConfigurationForTests.COMPONENT_NAME,
-      ConfigurationForTests.MODULE_NAME,
-      ConfigurationForTests.SWAGGER_FILE_FAVORITES
-  )
+    private val favoritesSchemaProteinConfig = ProteinApiConfiguration(
+        ConfigurationForTests.SERVICE_ENDPOINT,
+        "",
+        ConfigurationForTests.PACKAGE_NAME,
+        ConfigurationForTests.COMPONENT_NAME,
+        ConfigurationForTests.MODULE_NAME,
+        ConfigurationForTests.SWAGGER_FILE_FAVORITES
+    )
 
-  private val openStfSchemaProteinConfig = ProteinApiConfiguration(
-      ConfigurationForTests.SERVICE_ENDPOINT,
-      "",
-      ConfigurationForTests.PACKAGE_NAME,
-      ConfigurationForTests.COMPONENT_NAME,
-      ConfigurationForTests.MODULE_NAME,
-      ConfigurationForTests.SWAGGER_FILE_OPENSTF
-  )
+    private val openStfSchemaProteinConfig = ProteinApiConfiguration(
+        ConfigurationForTests.SERVICE_ENDPOINT,
+        "",
+        ConfigurationForTests.PACKAGE_NAME,
+        ConfigurationForTests.COMPONENT_NAME,
+        ConfigurationForTests.MODULE_NAME,
+        ConfigurationForTests.SWAGGER_FILE_OPENSTF
+    )
 
-  private val petStoreSchemaProteinConfig = ProteinApiConfiguration(
-      ConfigurationForTests.SERVICE_ENDPOINT,
-      "",
-      ConfigurationForTests.PACKAGE_NAME,
-      ConfigurationForTests.COMPONENT_NAME,
-      ConfigurationForTests.MODULE_NAME,
-      ConfigurationForTests.SWAGGER_FILE_PET_STORE
-  )
+    private val petStoreSchemaProteinConfig = ProteinApiConfiguration(
+        ConfigurationForTests.SERVICE_ENDPOINT,
+        "",
+        ConfigurationForTests.PACKAGE_NAME,
+        ConfigurationForTests.COMPONENT_NAME,
+        ConfigurationForTests.MODULE_NAME,
+        ConfigurationForTests.SWAGGER_FILE_PET_STORE
+    )
 
-  private val juvoSchemaProteinConfig = ProteinApiConfiguration(
-    "",
-    "https://api.weinand.it:5002/swagger/v1/swagger.json",
-    ConfigurationForTests.PACKAGE_NAME,
-    ConfigurationForTests.COMPONENT_NAME,
-    ConfigurationForTests.MODULE_NAME,
-    ConfigurationForTests.SWAGGER_FILE_PET_STORE
-  )
+    private val juvoSchemaProteinConfig = ProteinApiConfiguration(
+        "",
+        "https://api.weinand.it:5002/swagger/v1/swagger.json",
+        ConfigurationForTests.PACKAGE_NAME,
+        ConfigurationForTests.COMPONENT_NAME,
+        ConfigurationForTests.MODULE_NAME,
+        ConfigurationForTests.SWAGGER_FILE_PET_STORE
+    )
 
-  private val consoleLogTracking = ConsoleLogTracking()
+    private val consoleLogTracking = ConsoleLogTracking()
 
-  @Test
-  fun createInterfaceIfFavoritesSchemaFileProvided() {
-    val kotlinApiBuilder = KotlinApiBuilder(favoritesSchemaProteinConfig, consoleLogTracking)
-    kotlinApiBuilder.build()
-    assertEquals("",
-        "package com.mycompany.mylibrary\n" +
-            "\n" +
-            "import io.reactivex.Completable\n" +
-            "import io.reactivex.Single\n" +
-            "import retrofit2.http.DELETE\n" +
-            "import retrofit2.http.GET\n" +
-            "import retrofit2.http.PUT\n" +
-            "import retrofit2.http.Path\n" +
-            "\n" +
-            "interface componentNameApiInterface {\n" +
-            "    /**\n" +
-            "     * Get all favorites for this user\n" +
-            "     *\n" +
-            "     * @param Authorization Authorization\n" +
-            "     */\n" +
-            "    @GET(\"/favorites\")\n" +
-            "    fun getFavorites(): Single<GetFavoritesResponse>\n" +
-            "\n" +
-            "    /**\n" +
-            "     * Save favorite\n" +
-            "     *\n" +
-            "     * @param adId adId\n" +
-            "     * @param Authorization Authorization\n" +
-            "     */\n" +
-            "    @PUT(\"/favorites/{adId}\")\n" +
-            "    fun saveFavorite(@Path(\"adId\") adId: String): Completable\n" +
-            "\n" +
-            "    /**\n" +
-            "     * Delete favorite\n" +
-            "     *\n" +
-            "     * @param adId adId\n" +
-            "     * @param Authorization Authorization\n" +
-            "     */\n" +
-            "    @DELETE(\"/favorites/{adId}\")\n" +
-            "    fun deleteFavorite(@Path(\"adId\") adId: String): Completable\n" +
-            "}\n",
-        kotlinApiBuilder.getGeneratedApiInterfaceString())
-  }
+    @Test
+    fun createInterfaceIfFavoritesSchemaFileProvided() {
+        val kotlinApiBuilder = KotlinApiBuilder(favoritesSchemaProteinConfig, consoleLogTracking)
+        kotlinApiBuilder.build()
+        assertEquals("",
+            "package com.mycompany.mylibrary\n" +
+                "\n" +
+                "import io.reactivex.Completable\n" +
+                "import io.reactivex.Single\n" +
+                "import retrofit2.http.DELETE\n" +
+                "import retrofit2.http.GET\n" +
+                "import retrofit2.http.PUT\n" +
+                "import retrofit2.http.Path\n" +
+                "\n" +
+                "interface componentNameApiInterface {\n" +
+                "    /**\n" +
+                "     * Get all favorites for this user\n" +
+                "     *\n" +
+                "     * @param Authorization Authorization\n" +
+                "     */\n" +
+                "    @GET(\"/favorites\")\n" +
+                "    fun getFavorites(): Single<GetFavoritesResponse>\n" +
+                "\n" +
+                "    /**\n" +
+                "     * Save favorite\n" +
+                "     *\n" +
+                "     * @param adId adId\n" +
+                "     * @param Authorization Authorization\n" +
+                "     */\n" +
+                "    @PUT(\"/favorites/{adId}\")\n" +
+                "    fun saveFavorite(@Path(\"adId\") adId: String): Completable\n" +
+                "\n" +
+                "    /**\n" +
+                "     * Delete favorite\n" +
+                "     *\n" +
+                "     * @param adId adId\n" +
+                "     * @param Authorization Authorization\n" +
+                "     */\n" +
+                "    @DELETE(\"/favorites/{adId}\")\n" +
+                "    fun deleteFavorite(@Path(\"adId\") adId: String): Completable\n" +
+                "}\n",
+            kotlinApiBuilder.getGeneratedApiInterfaceString())
+    }
 
-  @Test
-  fun createInterfaceIfOpenStfSchemaFileProvided() {
-    val kotlinApiBuilder = KotlinApiBuilder(openStfSchemaProteinConfig, consoleLogTracking)
-    kotlinApiBuilder.build()
-    assertEquals("",
-        OPENSTF_INTERFACE_MOCK,
-        kotlinApiBuilder.getGeneratedApiInterfaceString())
-  }
+    @Test
+    fun createInterfaceIfOpenStfSchemaFileProvided() {
+        val kotlinApiBuilder = KotlinApiBuilder(openStfSchemaProteinConfig, consoleLogTracking)
+        kotlinApiBuilder.build()
+        assertEquals("",
+            OPENSTF_INTERFACE_MOCK,
+            kotlinApiBuilder.getGeneratedApiInterfaceString())
+    }
 
-  @Test
-  fun createInterfaceIfPetStoreSchemaFileProvided() {
-    val kotlinApiBuilder = KotlinApiBuilder(petStoreSchemaProteinConfig, consoleLogTracking)
-    kotlinApiBuilder.build()
-    assertEquals("",
-        PET_STORE_INTERFACE_MOCK,
-        kotlinApiBuilder.getGeneratedApiInterfaceString())
-  }
+    @Test
+    fun createInterfaceIfPetStoreSchemaFileProvided() {
+        val kotlinApiBuilder = KotlinApiBuilder(petStoreSchemaProteinConfig, consoleLogTracking)
+        kotlinApiBuilder.build()
+        assertEquals("",
+            PET_STORE_INTERFACE_MOCK,
+            kotlinApiBuilder.getGeneratedApiInterfaceString())
+    }
 
-  @Test
-  fun createInterfaceIfJuvoSchemaFileProvided() {
-    val kotlinApiBuilder = KotlinApiBuilder(juvoSchemaProteinConfig, consoleLogTracking)
-    kotlinApiBuilder.build()
-    assertEquals("",
-      "",
-      kotlinApiBuilder.getGeneratedApiInterfaceString())
-  }
+    @Test
+    fun createInterfaceIfJuvoSchemaFileProvided() {
+        val kotlinApiBuilder = KotlinApiBuilder(juvoSchemaProteinConfig, consoleLogTracking)
+        kotlinApiBuilder.build()
+        assertEquals("",
+            "",
+            kotlinApiBuilder.getGeneratedApiInterfaceString())
+    }
 }

@@ -6,8 +6,8 @@ import protein.steps.ModuleSelectorStep
 
 class AddComponentWizardModel(title: String) : WizardModel(title) {
 
-  init {
-    add(ModuleSelectorStep())
-    add(PackageInfoStep())
-  }
+    init {
+        add(ModuleSelectorStep())
+        add(PackageInfoStep())
+    }
 }

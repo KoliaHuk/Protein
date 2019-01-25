@@ -10,22 +10,22 @@ import com.intellij.openapi.project.Project
 
 class ProteinUpdateComponent(project: Project) : AbstractProjectComponent(project) {
 
-  private val applicationComponent = ProteinComponent.instance
+    private val applicationComponent = ProteinComponent.instance
 
-  override fun projectOpened() {
-    if (applicationComponent.updated) {
-      showUpdate(myProject)
-      applicationComponent.updated = false
+    override fun projectOpened() {
+        if (applicationComponent.updated) {
+            showUpdate(myProject)
+            applicationComponent.updated = false
+        }
     }
-  }
 
-  companion object {
-    private fun getPlugin(): IdeaPluginDescriptor? =
-        PluginManager.getPlugin(PluginId.getId("com.schibsted.protein"))
+    companion object {
+        private fun getPlugin(): IdeaPluginDescriptor? =
+            PluginManager.getPlugin(PluginId.getId("com.schibsted.protein"))
 
-    private val version = getPlugin()?.version
-    private var channel = "com.schibsted.protein"
-    private const val updateContent = """
+        private val version = getPlugin()?.version
+        private var channel = "com.schibsted.protein"
+        private const val updateContent = """
     <br/>
     Thank you for downloading <b>Protein - Kotlin code generator for Retrofit2 and RxJava2 based on Swagger</b>!<br>
     If you find my plugin helpful,
@@ -36,15 +36,15 @@ class ProteinUpdateComponent(project: Project) : AbstractProjectComponent(projec
     for more details.
     """
 
-    private fun showUpdate(project: Project) {
-      show(
-          project,
-          "Protein updated to $version",
-          updateContent,
-          channel + "_UPDATE",
-          NotificationType.INFORMATION,
-          NotificationListener.URL_OPENING_LISTENER
-      )
+        private fun showUpdate(project: Project) {
+            show(
+                project,
+                "Protein updated to $version",
+                updateContent,
+                channel + "_UPDATE",
+                NotificationType.INFORMATION,
+                NotificationListener.URL_OPENING_LISTENER
+            )
+        }
     }
-  }
 }

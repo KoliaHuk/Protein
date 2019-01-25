@@ -6,7 +6,7 @@ import protein.AddComponentWizard
 
 class AddNewComponentAction : AnAction() {
 
-  override fun actionPerformed(event: AnActionEvent) {
-    AddComponentWizard.run()
-  }
+    override fun actionPerformed(event: AnActionEvent) {
+        AddComponentWizard.run()
+    }
 }

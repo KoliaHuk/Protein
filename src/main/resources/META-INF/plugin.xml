@@ -1,10 +1,10 @@
 <idea-plugin>
-  <id>com.schibsted.protein</id>
-  <name>Protein - Kotlin code generator for Retrofit2 and RxJava2 based on Swagger</name>
-  <version>1.1.2</version>
-  <vendor email="ferran.pons@schibsted.com" url="http://www.schibsted.es">Schibsted Spain</vendor>
+    <id>com.schibsted.protein</id>
+    <name>Protein - Kotlin code generator for Retrofit2 and RxJava2 based on Swagger</name>
+    <version>1.1.2</version>
+    <vendor email="ferran.pons@schibsted.com" url="http://www.schibsted.es">Schibsted Spain</vendor>
 
-  <description><![CDATA[
+    <description><![CDATA[
 
 <p><em>Kotlin code generator for Retrofit2 and RxJava2 based on Swagger</em></p>
 
@@ -41,49 +41,50 @@
 
     ]]></description>
 
-  <change-notes><![CDATA[
+    <change-notes><![CDATA[
       Adds support for Lists, more numeric types, nullability.<br/>
       Adds a simple KDoc to the request methods, using the summary field.<br/>
       Also lists parameter descriptions, when they exist.
     ]]>
-  </change-notes>
+    </change-notes>
 
-  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-  <idea-version since-build="141.0"/>
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <idea-version since-build="141.0"/>
 
-  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
-       on how to target different products -->
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
 
-  <depends optional="true">org.jetbrains.android</depends>
-  <depends>org.jetbrains.kotlin</depends>
-  <depends>com.intellij.modules.java</depends>
-  <depends optional="true">com.intellij.modules.androidstudio</depends>
+    <depends optional="true">org.jetbrains.android</depends>
+    <depends>org.jetbrains.kotlin</depends>
+    <depends>com.intellij.modules.java</depends>
+    <depends optional="true">com.intellij.modules.androidstudio</depends>
 
-  <extensions defaultExtensionNs="com.intellij">
-    <applicationService serviceInterface="protein.ide.component.ProteinSettings"
-                        serviceImplementation="protein.ide.component.ProteinSettings"/>
-  </extensions>
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationService serviceInterface="protein.ide.component.ProteinSettings"
+                            serviceImplementation="protein.ide.component.ProteinSettings"/>
+    </extensions>
 
-  <application-components>
-    <component>
-      <implementation-class>protein.ide.component.ProteinComponent</implementation-class>
-    </component>
-  </application-components>
+    <application-components>
+        <component>
+            <implementation-class>protein.ide.component.ProteinComponent</implementation-class>
+        </component>
+    </application-components>
 
-  <project-components>
-    <component>
-      <implementation-class>protein.ide.component.ProteinUpdateComponent</implementation-class>
-    </component>
-  </project-components>
+    <project-components>
+        <component>
+            <implementation-class>protein.ide.component.ProteinUpdateComponent</implementation-class>
+        </component>
+    </project-components>
 
-  <actions>
-    <!-- Add your actions here -->
-    <action id="protein_add_new_api_interface" class="protein.actions.AddNewComponentAction" text="Protein - Add new API Rest Interface"
-            description="Add new API Rest Interface and Models" icon="/icons/add_agent_icon.png">
-      <add-to-group group-id="NewJavaSpecialFile" anchor="last" />
-      <add-to-group group-id="MainToolBar" anchor="last" />
-      <add-to-group group-id="NavBarToolBar" anchor="last" />
-    </action>
-  </actions>
+    <actions>
+        <!-- Add your actions here -->
+        <action id="protein_add_new_api_interface" class="protein.actions.AddNewComponentAction"
+                text="Protein - Add new API Rest Interface"
+                description="Add new API Rest Interface and Models" icon="/icons/add_agent_icon.png">
+            <add-to-group group-id="NewJavaSpecialFile" anchor="last"/>
+            <add-to-group group-id="MainToolBar" anchor="last"/>
+            <add-to-group group-id="NavBarToolBar" anchor="last"/>
+        </action>
+    </actions>
 
 </idea-plugin>
