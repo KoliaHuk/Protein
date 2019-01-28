@@ -89,6 +89,7 @@ class KotlinApiBuilder(
     private val models: MutableMap<String, Model> = mutableMapOf()
     private val responseBodyModelListTypeSpec: ArrayList<TypeSpec> = ArrayList()
     private val databaseEntitiesTypeSpec: ArrayList<TypeSpec> = ArrayList()
+    private val mappersTypeSpec: ArrayList<TypeSpec> = ArrayList()
     private val enumListTypeSpec: ArrayList<TypeSpec> = ArrayList()
 
     fun build() {
@@ -96,6 +97,7 @@ class KotlinApiBuilder(
         filterModels()
         apiInterfaceTypeSpec = createApiRetrofitInterface(createApiResponseBodyModel())
         createDatabaseEntities()
+        createMappers(proteinApiConfiguration.packageName)
     }
 
     fun getGeneratedTypeSpec(): TypeSpec {
@@ -108,12 +110,17 @@ class KotlinApiBuilder(
 
         for (typeSpec in responseBodyModelListTypeSpec) {
             StorageUtils.generateFiles(
-                proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName, typeSpec)
+                proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName + ".sync.entity", typeSpec)
         }
 
         for (typeSpec in databaseEntitiesTypeSpec) {
             StorageUtils.generateFiles(
-                proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName, typeSpec)
+                proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName + ".database.entity", typeSpec)
+        }
+
+        for (typeSpec in mappersTypeSpec) {
+            StorageUtils.generateFiles(
+                proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName + ".mapper", typeSpec)
         }
 
         /*for (typeSpec in enumListTypeSpec) {
@@ -247,12 +254,16 @@ class KotlinApiBuilder(
             if (definition.value.properties != null) {
                 val primaryConstructor = FunSpec.constructorBuilder()
                 for (modelProperty in definition.value.properties) {
-                    if (modelProperty.value.type == REF_SWAGGER_TYPE ||
-                        modelProperty.value.type == ARRAY_SWAGGER_TYPE) {
+                    if (modelProperty.value.type == ARRAY_SWAGGER_TYPE) {
                         continue
                     }
-                    val typeName: TypeName = getTypeName(modelProperty)
                     var propertyName = modelProperty.key
+                    val typeName = if (modelProperty.value.type == REF_SWAGGER_TYPE) {
+                        propertyName = "id${propertyName.capitalize()}"
+                        Int::class.asTypeName().requiredOrNullable(modelProperty.value.required)
+                    } else {
+                        getTypeName(modelProperty)
+                    }
                     val propertySpecBuilder = if (modelProperty.key == "id") {
                         propertyName += definition.key
                         PropertySpec.builder(propertyName , typeName)
@@ -298,6 +309,51 @@ class KotlinApiBuilder(
         }
 
         return classNameList
+    }
+
+    private fun createMappers(packageName: String) {
+        val classNameList = ArrayList<String>()
+
+        for (definition in models) {
+            var modelClassTypeSpec: TypeSpec.Builder
+            try {
+                modelClassTypeSpec = TypeSpec.classBuilder(definition.key + "EntityMapper")
+                classNameList.add(definition.key + "Entity")
+            } catch (error: IllegalArgumentException) {
+                modelClassTypeSpec = TypeSpec.classBuilder("Model" + definition.key.capitalize())
+                classNameList.add("Model" + definition.key.capitalize())
+            }
+
+            if (definition.value.properties != null) {
+                val syncEntity = ClassName("$packageName.sync.entity", definition.key)
+                val databaseEntity = ClassName("$packageName.database.entity", definition.key + "Entity")
+
+                val parameters = definition.value.properties.filter {
+                    it.value.type != ARRAY_SWAGGER_TYPE
+                }
+                val statement = parameters.entries.joinToString(separator = ",\n    ", prefix = "(\n    ", postfix = "\n)") {
+                    var param = it.key
+                    if (it.value.type == REF_SWAGGER_TYPE) {
+                        param = "id${param.capitalize()}"
+                        return@joinToString "$param = entity.${it.key}?.id"
+                    }
+                    if (param == "id") {
+                        param += definition.key
+                    }
+                    return@joinToString "$param = entity.${it.key}"
+                }
+
+                val funcFromSyncToDatabase = FunSpec.builder("transform")
+                    .addParameter("entity", syncEntity)
+                    .addStatement("return %T%L", databaseEntity, statement)
+                    .build()
+
+                modelClassTypeSpec.addFunction(funcFromSyncToDatabase)
+                mappersTypeSpec.add(modelClassTypeSpec.build())
+            }
+        }
+
+        //return classNameList
     }
 
     private fun addEmbeddedAnnotations(entityAn: AnnotationSpec.Builder, annot: List<AnnotationSpec>) {

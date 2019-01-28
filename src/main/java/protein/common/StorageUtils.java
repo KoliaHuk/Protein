@@ -79,6 +79,6 @@ public class StorageUtils {
 
     private static void trackError(IOException e) {
         Bugsnag bugSnag = new Bugsnag("a33c387e14e810eace96242d7382737d");
-        bugSnag.notify(e);
+        //bugSnag.notify(e);
     }
 }
