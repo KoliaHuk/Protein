@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="426404f3-14cf-4cf9-be47-115388e0e4f1" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/Protein.iws" beforeDir="false" afterPath="$PROJECT_DIR$/Protein.iws" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/protein/common/StorageUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/protein/common/StorageUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/protein/extensions/string_extensions.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/protein/extensions/string_extensions.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/protein/kotlinbuilders/KotlinApiBuilder.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/protein/kotlinbuilders/KotlinApiBuilder.kt" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.gradle/" />
@@ -56,8 +56,20 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/kotlin/protein/kotlinbuilders/KotlinApiBuilder.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="333">
-              <caret line="338" column="21" lean-forward="true" selection-start-line="338" selection-start-column="21" selection-end-line="338" selection-end-column="21" />
+            <state relative-caret-position="434">
+              <caret line="416" column="30" selection-start-line="416" selection-start-column="30" selection-end-line="416" selection-end-column="30" />
+              <folding>
+                <element signature="e#32#2261#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.3.11/e49742d3259938ea3539346c8ca3babb54a5140f/kotlin-stdlib-common-1.3.11-sources.jar!/kotlin/text/Strings.kt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="863">
+              <caret line="1057" column="44" lean-forward="true" selection-start-line="1057" selection-start-column="44" selection-end-line="1057" selection-end-column="44" />
             </state>
           </provider>
         </entry>
@@ -83,8 +95,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/kotlin/protein/extensions/string_extensions.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="68">
-              <caret line="4" column="1" selection-start-line="4" selection-start-column="1" selection-end-line="4" selection-end-column="1" />
+            <state relative-caret-position="34">
+              <caret line="2" column="26" selection-start-line="2" selection-start-column="26" selection-end-line="2" selection-end-column="26" />
             </state>
           </provider>
         </entry>
@@ -118,6 +130,13 @@
       <find>float</find>
       <find>reposito</find>
       <find>data</find>
+      <find>REF</find>
+      <find>paramet</find>
+      <find>de.</find>
+      <find>d</find>
+      <find>addcom</find>
+      <find>basedao</find>
+      <find>foreig</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -129,8 +148,8 @@
         <option value="$PROJECT_DIR$/src/test/kotlin/KotlinApiBuilderShould.kt" />
         <option value="$PROJECT_DIR$/build.gradle" />
         <option value="$PROJECT_DIR$/.editorconfig" />
-        <option value="$PROJECT_DIR$/src/main/kotlin/protein/extensions/string_extensions.kt" />
         <option value="$PROJECT_DIR$/src/main/java/protein/common/StorageUtils.java" />
+        <option value="$PROJECT_DIR$/src/main/kotlin/protein/extensions/string_extensions.kt" />
         <option value="$PROJECT_DIR$/src/main/kotlin/protein/kotlinbuilders/KotlinApiBuilder.kt" />
       </list>
     </option>
@@ -213,6 +232,15 @@
               <item name="main" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
               <item name="kotlin" type="462c0819:PsiDirectoryNode" />
               <item name="protein" type="462c0819:PsiDirectoryNode" />
+              <item name="extensions" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Protein" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Protein" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
+              <item name="kotlin" type="462c0819:PsiDirectoryNode" />
+              <item name="protein" type="462c0819:PsiDirectoryNode" />
               <item name="component" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -250,7 +278,7 @@
     <property name="Repository.Attach.Annotations" value="false" />
     <property name="Repository.Attach.JavaDocs" value="false" />
     <property name="Repository.Attach.Sources" value="false" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1548667444421" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1548696353850" />
     <property name="editor.config.ad.shown" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/build.gradle" />
     <property name="project.structure.last.edited" value="Libraries" />
@@ -343,13 +371,34 @@
     <servers />
   </component>
   <component name="TestHistory">
-    <history-entry file="KotlinApiBuilderShould_createInterfaceIfJuvoSchemaFileProvided - 2019.01.25 at 15h 12m 51s.xml">
+    <history-entry file="KotlinApiBuilderShould_createInterfaceIfJuvoSchemaFileProvided - 2019.01.28 at 17h 07m 35s.xml">
       <configuration name="KotlinApiBuilderShould.createInterfaceIfJuvoSchemaFileProvided" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="KotlinApiBuilderShould_createInterfaceIfJuvoSchemaFileProvided - 2019.01.28 at 10h 42m 12s.xml">
+    <history-entry file="KotlinApiBuilderShould_createInterfaceIfJuvoSchemaFileProvided - 2019.01.28 at 17h 09m 43s.xml">
       <configuration name="KotlinApiBuilderShould.createInterfaceIfJuvoSchemaFileProvided" configurationId="JUnit" />
     </history-entry>
-    <history-entry file="KotlinApiBuilderShould_createInterfaceIfJuvoSchemaFileProvided - 2019.01.28 at 11h 15m 15s.xml">
+    <history-entry file="KotlinApiBuilderShould_createInterfaceIfJuvoSchemaFileProvided - 2019.01.28 at 17h 11m 17s.xml">
+      <configuration name="KotlinApiBuilderShould.createInterfaceIfJuvoSchemaFileProvided" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="KotlinApiBuilderShould_createInterfaceIfJuvoSchemaFileProvided - 2019.01.28 at 18h 11m 14s.xml">
+      <configuration name="KotlinApiBuilderShould.createInterfaceIfJuvoSchemaFileProvided" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="KotlinApiBuilderShould_createInterfaceIfJuvoSchemaFileProvided - 2019.01.28 at 18h 43m 39s.xml">
+      <configuration name="KotlinApiBuilderShould.createInterfaceIfJuvoSchemaFileProvided" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="KotlinApiBuilderShould_createInterfaceIfJuvoSchemaFileProvided - 2019.01.28 at 18h 54m 19s.xml">
+      <configuration name="KotlinApiBuilderShould.createInterfaceIfJuvoSchemaFileProvided" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="KotlinApiBuilderShould_createInterfaceIfJuvoSchemaFileProvided - 2019.01.28 at 18h 55m 16s.xml">
+      <configuration name="KotlinApiBuilderShould.createInterfaceIfJuvoSchemaFileProvided" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="KotlinApiBuilderShould_createInterfaceIfJuvoSchemaFileProvided - 2019.01.28 at 18h 56m 04s.xml">
+      <configuration name="KotlinApiBuilderShould.createInterfaceIfJuvoSchemaFileProvided" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="KotlinApiBuilderShould_createInterfaceIfJuvoSchemaFileProvided - 2019.01.28 at 18h 58m 59s.xml">
+      <configuration name="KotlinApiBuilderShould.createInterfaceIfJuvoSchemaFileProvided" configurationId="JUnit" />
+    </history-entry>
+    <history-entry file="KotlinApiBuilderShould_createInterfaceIfJuvoSchemaFileProvided - 2019.01.28 at 19h 17m 34s.xml">
       <configuration name="KotlinApiBuilderShould.createInterfaceIfJuvoSchemaFileProvided" configurationId="JUnit" />
     </history-entry>
   </component>
@@ -377,7 +426,7 @@
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="right" id="Palette" />
-      <window_info anchor="right" id="Gradle" weight="0.32995737" />
+      <window_info anchor="right" id="Gradle" visible="true" weight="0.32995737" />
       <window_info anchor="right" id="Theme Preview" />
       <window_info anchor="right" id="Maven" />
       <window_info anchor="right" id="Capture Analysis" />
@@ -387,6 +436,32 @@
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
     </layout>
   </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="kotlin-line">
+          <url>file://$PROJECT_DIR$/src/main/kotlin/protein/kotlinbuilders/KotlinApiBuilder.kt</url>
+          <line>110</line>
+          <properties />
+          <option name="timeStamp" value="14" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="JUnit">
+        <watch expression="models" language="kotlin" />
+      </configuration>
+    </watches-manager>
+  </component>
+  <component name="debuggerHistoryManager">
+    <expressions id="watch">
+      <expression>
+        <expression-string>models</expression-string>
+        <language-id>kotlin</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+    </expressions>
+  </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/main/kotlin/protein/kotlinbuilders/ProteinApiConfiguration.kt">
       <provider selected="true" editor-type-id="text-editor" />
@@ -395,13 +470,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-7">
           <caret line="10" column="6" selection-start-line="10" selection-start-column="6" selection-end-line="10" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/kotlin/protein/actions/AddNewComponentAction.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-7">
-          <caret line="6" column="6" selection-start-line="6" selection-start-column="6" selection-end-line="6" selection-end-column="6" />
         </state>
       </provider>
     </entry>
@@ -458,13 +526,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.swagger/swagger-models/1.5.17/bd4bbbcd0cd3e1df676baf1cf7dccb8fccc361d6/swagger-models-1.5.17-sources.jar!/io/swagger/models/Model.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="15" column="26" selection-start-line="15" selection-start-column="26" selection-end-line="15" selection-end-column="26" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/.gradle/wrapper/dists/gradle-4.4-all/9br9xq1tocpiv8o6njlyu5op1/gradle-4.4/src/core-api/org/gradle/api/artifacts/dsl/RepositoryHandler.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="441">
@@ -500,38 +561,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.3.11/e49742d3259938ea3539346c8ca3babb54a5140f/kotlin-stdlib-common-1.3.11-sources.jar!/kotlin/text/Strings.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="365">
-          <caret line="536" column="20" selection-start-line="536" selection-start-column="20" selection-end-line="536" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/kotlin/protein/extensions/string_extensions.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="4" column="1" selection-start-line="4" selection-start-column="1" selection-end-line="4" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.3.11/d46e00faac79f8ec6bb956154ecde4282871a6bf/kotlin-stdlib-1.3.11-sources.jar!/kotlin/text/StringsJVM.kt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="305">
           <caret line="177" column="3" lean-forward="true" selection-start-line="177" selection-start-column="3" selection-end-line="177" selection-end-column="3" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.squareup/kotlinpoet/1.0.0-RC2/dcfb724ff7d15f285c6cc77a3f57481fcd27546d/kotlinpoet-1.0.0-RC2-sources.jar!/com/squareup/kotlinpoet/CodeBlock.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="319">
-          <caret line="241" column="38" lean-forward="true" selection-start-line="241" selection-start-column="38" selection-end-line="241" selection-end-column="38" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.squareup/kotlinpoet/1.0.0-RC2/dcfb724ff7d15f285c6cc77a3f57481fcd27546d/kotlinpoet-1.0.0-RC2-sources.jar!/com/squareup/kotlinpoet/AnnotationSpec.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="217">
-          <caret line="106" column="51" selection-start-line="106" selection-start-column="51" selection-end-line="106" selection-end-column="51" />
         </state>
       </provider>
     </entry>
@@ -552,13 +585,6 @@
     <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.squareup/kotlinpoet/1.0.0-RC2/e2b1331da63dff4701cd523ab6ea2f3aadac1e71/kotlinpoet-1.0.0-RC2.jar!/com/squareup/kotlinpoet/FileSpec.class">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/kotlin/KotlinApiBuilderShould.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="414">
-          <caret line="114" selection-start-line="114" selection-end-line="114" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/protein/common/StorageUtils.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="226">
@@ -566,17 +592,115 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.squareup/kotlinpoet/1.0.0-RC2/dcfb724ff7d15f285c6cc77a3f57481fcd27546d/kotlinpoet-1.0.0-RC2-sources.jar!/com/squareup/kotlinpoet/TypeName.kt">
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/protein/actions/AddNewComponentAction.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="6" column="6" selection-start-line="6" selection-start-column="6" selection-end-line="6" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.swagger/swagger-models/1.5.17/bd4bbbcd0cd3e1df676baf1cf7dccb8fccc361d6/swagger-models-1.5.17-sources.jar!/io/swagger/models/Swagger.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="224">
-          <caret line="80" column="15" selection-start-line="80" selection-start-column="15" selection-end-line="80" selection-end-column="15" />
+          <caret line="336" column="25" lean-forward="true" selection-start-line="336" selection-start-column="25" selection-end-line="336" selection-end-column="25" />
+          <folding>
+            <element signature="e#8519#8520#0" expanded="true" />
+            <element signature="e#8553#8554#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_201/src.zip!/java/util/ArrayList.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="224">
+          <caret line="280" column="15" selection-start-line="280" selection-start-column="15" selection-end-line="280" selection-end-column="15" />
+          <folding>
+            <element signature="e#10361#10362#0" expanded="true" />
+            <element signature="e#10388#10389#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.swagger/swagger-models/1.5.17/bd4bbbcd0cd3e1df676baf1cf7dccb8fccc361d6/swagger-models-1.5.17-sources.jar!/io/swagger/models/Model.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="476">
+          <caret line="30" lean-forward="true" selection-start-line="30" selection-end-line="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.squareup/kotlinpoet/1.0.0-RC2/dcfb724ff7d15f285c6cc77a3f57481fcd27546d/kotlinpoet-1.0.0-RC2-sources.jar!/com/squareup/kotlinpoet/TypeName.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="576">
+          <caret line="143" column="72" selection-start-line="143" selection-start-column="72" selection-end-line="143" selection-end-column="72" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.squareup/kotlinpoet/1.0.0-RC2/dcfb724ff7d15f285c6cc77a3f57481fcd27546d/kotlinpoet-1.0.0-RC2-sources.jar!/com/squareup/kotlinpoet/ParameterizedTypeName.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="348">
+          <caret line="94" column="46" selection-start-line="94" selection-start-column="46" selection-end-line="94" selection-end-column="46" />
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/test/kotlin/KotlinApiBuilderShould.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="414">
+          <caret line="114" column="25" lean-forward="true" selection-start-line="114" selection-start-column="25" selection-end-line="114" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.squareup/kotlinpoet/1.0.0-RC2/dcfb724ff7d15f285c6cc77a3f57481fcd27546d/kotlinpoet-1.0.0-RC2-sources.jar!/com/squareup/kotlinpoet/AnnotationSpec.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="200">
+          <caret line="106" column="8" selection-start-line="106" selection-start-column="8" selection-end-line="106" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.squareup.retrofit2/retrofit/2.4.0/451207353948708405a08287e2a315c3f23553fe/retrofit-2.4.0-sources.jar!/retrofit2/http/Query.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="419">
+          <caret line="72" column="18" selection-start-line="72" selection-start-column="18" selection-end-line="72" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/protein/extensions/string_extensions.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="2" column="26" selection-start-line="2" selection-start-column="26" selection-end-line="2" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.squareup/kotlinpoet/1.0.0-RC2/dcfb724ff7d15f285c6cc77a3f57481fcd27546d/kotlinpoet-1.0.0-RC2-sources.jar!/com/squareup/kotlinpoet/FunSpec.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="321">
+          <caret line="341" column="14" selection-start-line="341" selection-start-column="8" selection-end-line="341" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.squareup/kotlinpoet/1.0.0-RC2/dcfb724ff7d15f285c6cc77a3f57481fcd27546d/kotlinpoet-1.0.0-RC2-sources.jar!/com/squareup/kotlinpoet/CodeBlock.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="219">
+          <caret line="390" column="8" selection-start-line="390" selection-start-column="8" selection-end-line="390" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.3.11/e49742d3259938ea3539346c8ca3babb54a5140f/kotlin-stdlib-common-1.3.11-sources.jar!/kotlin/text/Strings.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="863">
+          <caret line="1057" column="44" lean-forward="true" selection-start-line="1057" selection-start-column="44" selection-end-line="1057" selection-end-column="44" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/kotlin/protein/kotlinbuilders/KotlinApiBuilder.kt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="333">
-          <caret line="338" column="21" lean-forward="true" selection-start-line="338" selection-start-column="21" selection-end-line="338" selection-end-column="21" />
+        <state relative-caret-position="434">
+          <caret line="416" column="30" selection-start-line="416" selection-start-column="30" selection-end-line="416" selection-end-column="30" />
+          <folding>
+            <element signature="e#32#2261#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

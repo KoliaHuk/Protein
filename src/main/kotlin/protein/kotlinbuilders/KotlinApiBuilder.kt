@@ -1,8 +1,12 @@
 package protein.kotlinbuilders
 
+import androidx.room.ColumnInfo
+import androidx.room.Dao
+import androidx.room.Database
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import androidx.room.Query
 import com.google.gson.annotations.SerializedName
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
@@ -17,6 +21,7 @@ import com.squareup.kotlinpoet.TypeVariableName
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.asTypeName
 import io.reactivex.Completable
+import io.reactivex.Flowable
 import io.reactivex.Single
 import io.swagger.models.HttpMethod
 import io.swagger.models.ModelImpl
@@ -39,6 +44,7 @@ import io.swagger.models.properties.RefProperty
 import io.swagger.models.properties.StringProperty
 import io.swagger.parser.SwaggerParser
 import protein.common.StorageUtils
+import protein.extensions.snake
 import protein.tracking.ErrorTracking
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -47,12 +53,12 @@ import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
-import retrofit2.http.Query
 import java.io.FileNotFoundException
 import java.lang.IllegalStateException
 import java.net.UnknownHostException
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.test.assertNotEquals
 
 class KotlinApiBuilder(
     private val proteinApiConfiguration: ProteinApiConfiguration,
@@ -89,15 +95,20 @@ class KotlinApiBuilder(
     private val models: MutableMap<String, Model> = mutableMapOf()
     private val responseBodyModelListTypeSpec: ArrayList<TypeSpec> = ArrayList()
     private val databaseEntitiesTypeSpec: ArrayList<TypeSpec> = ArrayList()
+    private val daoTypeSpec: ArrayList<TypeSpec> = ArrayList()
+    private lateinit var databaseTypeSpec: TypeSpec
     private val mappersTypeSpec: ArrayList<TypeSpec> = ArrayList()
     private val enumListTypeSpec: ArrayList<TypeSpec> = ArrayList()
 
     fun build() {
         createEnumClasses()
         filterModels()
+        val p = proteinApiConfiguration.packageName
         apiInterfaceTypeSpec = createApiRetrofitInterface(createApiResponseBodyModel())
-        createDatabaseEntities()
-        createMappers(proteinApiConfiguration.packageName)
+        createDatabaseEntities(p)
+        createDao(p)
+        createDatabase(p)
+        createMappers(p)
     }
 
     fun getGeneratedTypeSpec(): TypeSpec {
@@ -117,6 +128,14 @@ class KotlinApiBuilder(
             StorageUtils.generateFiles(
                 proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName + ".database.entity", typeSpec)
         }
+
+        for (typeSpec in daoTypeSpec) {
+            StorageUtils.generateFiles(
+                proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName + ".database.dao", typeSpec)
+        }
+
+        StorageUtils.generateFiles(
+            proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName + ".database", databaseTypeSpec)
 
         for (typeSpec in mappersTypeSpec) {
             StorageUtils.generateFiles(
@@ -191,7 +210,7 @@ class KotlinApiBuilder(
             while (i < types.size) {
                 val name = types[i]
                 val definition = findDefinition(name)
-                models[name] = definition
+                models[name.replace(Regex("SyncDto\\b|Dto\\b"), "")] = definition
                 findRefs(definition, types)
                 i++
             }
@@ -202,14 +221,8 @@ class KotlinApiBuilder(
         val classNameList = ArrayList<String>()
 
         for (definition in models) {
-            var modelClassTypeSpec: TypeSpec.Builder
-            try {
-                modelClassTypeSpec = TypeSpec.classBuilder(definition.key).addModifiers(KModifier.DATA)
-                classNameList.add(definition.key)
-            } catch (error: IllegalArgumentException) {
-                modelClassTypeSpec = TypeSpec.classBuilder("Model" + definition.key.capitalize()).addModifiers(KModifier.DATA)
-                classNameList.add("Model" + definition.key.capitalize())
-            }
+            val modelClassTypeSpec: TypeSpec.Builder = TypeSpec.classBuilder(definition.key).addModifiers(KModifier.DATA)
+            classNameList.add(definition.key)
 
             if (definition.value.properties != null) {
                 val primaryConstructor = FunSpec.constructorBuilder()
@@ -236,18 +249,12 @@ class KotlinApiBuilder(
         return classNameList
     }
 
-    private fun createDatabaseEntities(): List<String> {
+    private fun createDatabaseEntities(packageName: String): List<String> {
         val classNameList = ArrayList<String>()
 
         for (definition in models) {
-            var modelClassTypeSpec: TypeSpec.Builder
-            try {
-                modelClassTypeSpec = TypeSpec.classBuilder(definition.key + "Entity").addModifiers(KModifier.DATA)
-                classNameList.add(definition.key + "Entity")
-            } catch (error: IllegalArgumentException) {
-                modelClassTypeSpec = TypeSpec.classBuilder("Model" + definition.key.capitalize()).addModifiers(KModifier.DATA)
-                classNameList.add("Model" + definition.key.capitalize())
-            }
+            val modelClassTypeSpec: TypeSpec.Builder = TypeSpec.classBuilder(definition.key + "Entity").addModifiers(KModifier.DATA)
+            classNameList.add(definition.key + "Entity")
 
             val foreignKeys = mutableSetOf<String>()
 
@@ -279,6 +286,9 @@ class KotlinApiBuilder(
 
                     val propertySpec = propertySpecBuilder
                         .initializer(propertyName)
+                        .addAnnotation(AnnotationSpec.builder(ColumnInfo::class)
+                            .addMember("%L = %S", "name", propertyName.snake())
+                            .build())
                         .mutable()
                         .build()
                     val parameter = ParameterSpec.builder(propertyName, typeName)
@@ -290,12 +300,21 @@ class KotlinApiBuilder(
                 modelClassTypeSpec.primaryConstructor(primaryConstructor.build())
 
                 val entityAn = AnnotationSpec.builder(Entity::class)
+                    .addMember("%L = %S", "tableName", definition.key.snake())
                 val annot = foreignKeys.map {
-                    val entityClass = ClassName("de.weinandit.bestatterprogramma.modules.database.entity", it.substring(2) + "Entity")
+                    val parent = if (it.contains("ContactPersonGroup")
+                    || it.contains("PolicemanGroup")
+                    || it.contains("GuarantorGroup")
+                    || it.contains("ClerkGroup")) {
+                        "idPersonGroup"
+                    } else {
+                        it
+                    }
+                    val entityClass = ClassName("$packageName.database.entity", parent.substring(2) + "Entity")
                     AnnotationSpec.builder(ForeignKey::class)
                         .addMember("%L = %T::class", "entity", entityClass)
-                        .addMember("\n%L = arrayOf(%S)", "parentColumns", it)
-                        .addMember("\n%L = arrayOf(%S)", "childColumns", it)
+                        .addMember("\n%L = arrayOf(%S)", "parentColumns", parent.snake())
+                        .addMember("\n%L = arrayOf(%S)", "childColumns", it.snake())
                         .addMember("\n%L = %T.CASCADE", "onDelete", ForeignKey::class)
                         .addMember("\n%L = %T.CASCADE", "onUpdate", ForeignKey::class)
                         .build()
@@ -311,18 +330,101 @@ class KotlinApiBuilder(
         return classNameList
     }
 
+    private fun createDao(packageName: String) {
+        for (definition in models) {
+            val baseDao = ClassName("de.weinandit.bestatterprogramma.modules.database.dao", "BaseDao")
+            val entityName = definition.key + "Entity"
+            val snakeCaseName = definition.key.snake()
+            val parameterType = ClassName("$packageName.database.entity", entityName)
+            val modelClassTypeSpec = TypeSpec.interfaceBuilder(definition.key + "Dao")
+                .addSuperinterface(baseDao.parameterizedBy(parameterType))
+                .addAnnotation(AnnotationSpec.builder(Dao::class)
+                    .build())
+            if (definition.value.properties != null) {
+
+                modelClassTypeSpec.addFunction(FunSpec.builder("findAll")
+                    .addModifiers(KModifier.ABSTRACT)
+                    .returns(List::class.asTypeName().parameterizedBy(parameterType))
+                    .addAnnotation(AnnotationSpec.builder(Query::class)
+                        .addMember("%S", "SELECT * FROM `$snakeCaseName`")
+                        .build())
+                    .build())
+
+                modelClassTypeSpec.addFunction(FunSpec.builder("findAllFlow")
+                    .addModifiers(KModifier.ABSTRACT)
+                    .returns(Flowable::class.asTypeName().parameterizedBy(List::class.asTypeName().parameterizedBy(parameterType)))
+                    .addAnnotation(AnnotationSpec.builder(Query::class)
+                        .addMember("%S", "SELECT * FROM `$snakeCaseName`")
+                        .build())
+                    .build())
+
+                modelClassTypeSpec.addFunction(FunSpec.builder("findById")
+                    .addModifiers(KModifier.ABSTRACT)
+                    .returns(parameterType.asNullable())
+                    .addAnnotation(AnnotationSpec.builder(Query::class)
+                        .addMember("%S", "SELECT * FROM `$snakeCaseName` WHERE id_$snakeCaseName = :id")
+                        .build())
+                    .addParameter("id", Int::class)
+                    .build())
+
+                if (definition.value.properties.containsKey("modified")) {
+                    modelClassTypeSpec.addFunction(FunSpec.builder("findSinceBefore")
+                        .addModifiers(KModifier.ABSTRACT)
+                        .returns(List::class.asTypeName().parameterizedBy(parameterType))
+                        .addAnnotation(AnnotationSpec.builder(Query::class)
+                            .addMember("%S", "SELECT * FROM `$snakeCaseName` WHERE modified BETWEEN :since AND :before")
+                            .build())
+                        .addParameter("since", Date::class)
+                        .addParameter("before", Date::class)
+                        .build())
+                }
+
+                daoTypeSpec.add(modelClassTypeSpec.build())
+            }
+        }
+    }
+
+    private fun createDatabase(packageName: String) {
+        val sorted = daoTypeSpec.sortedWith(compareBy { it.name })
+        val literal = sorted.joinToString(separator = ",\n    ", prefix = "[\n", postfix = "\n]") {
+            "${it.name}::class"
+        }
+        val room = ClassName("androidx.room", "RoomDatabase")
+
+        val modelClassTypeSpec = TypeSpec.classBuilder("Database")
+            .superclass(room)
+            .addAnnotation(AnnotationSpec.builder(Database::class)
+                .addMember("%L = %L", "entities", literal)
+                .addMember("%L = %L", "version", 1)
+                .build())
+            .addModifiers(KModifier.ABSTRACT)
+
+        sorted.forEach {
+            val name = it.name?: "none"
+            val type = ClassName("$packageName.database.dao", name)
+            modelClassTypeSpec.addFunction(FunSpec.builder(name.decapitalize())
+                .returns(type)
+                .addModifiers(KModifier.ABSTRACT)
+                .build())
+        }
+
+        val depends = FunSpec.builder("depend")
+        depends.addCode("/*\n")
+        sorted.forEach {
+            val name = it.name?: "none"
+            depends.addStatement("single { get<BMSDatabase>().%L() }", name.decapitalize())
+        }
+        depends.addCode("\n*/")
+        modelClassTypeSpec.addFunction(depends.build())
+        databaseTypeSpec = modelClassTypeSpec.build()
+    }
+
     private fun createMappers(packageName: String) {
         val classNameList = ArrayList<String>()
 
         for (definition in models) {
-            var modelClassTypeSpec: TypeSpec.Builder
-            try {
-                modelClassTypeSpec = TypeSpec.classBuilder(definition.key + "EntityMapper")
-                classNameList.add(definition.key + "Entity")
-            } catch (error: IllegalArgumentException) {
-                modelClassTypeSpec = TypeSpec.classBuilder("Model" + definition.key.capitalize())
-                classNameList.add("Model" + definition.key.capitalize())
-            }
+            val modelClassTypeSpec: TypeSpec.Builder = TypeSpec.classBuilder(definition.key + "EntityMapper")
+            classNameList.add(definition.key + "Entity")
 
             if (definition.value.properties != null) {
                 val syncEntity = ClassName("$packageName.sync.entity", definition.key)
@@ -361,6 +463,25 @@ class KotlinApiBuilder(
             0 -> return
             1 -> entityAn.addMember("%L = [\n%L\n]", "foreignKeys", annot[0])
             2 -> entityAn.addMember("%L = [\n%L,\n%L\n]", "foreignKeys", annot[0], annot[1])
+            3 -> entityAn.addMember("%L = [\n%L,\n%L,\n%L\n]", "foreignKeys", annot[0], annot[1], annot[2])
+            4 -> entityAn.addMember("%L = [\n%L,\n%L,\n%L,\n%L\n]",
+                "foreignKeys", annot[0], annot[1], annot[2], annot[3])
+            5 -> entityAn.addMember("%L = [\n%L,\n%L,\n%L,\n%L,\n%L\n]",
+                "foreignKeys", annot[0], annot[1], annot[2], annot[3], annot[4])
+            6 -> entityAn.addMember("%L = [\n%L,\n%L,\n%L,\n%L,\n%L,\n%L\n]",
+                "foreignKeys", annot[0], annot[1], annot[2], annot[3], annot[4], annot[5])
+            7 -> entityAn.addMember("%L = [\n%L,\n%L,\n%L,\n%L,\n%L,\n%L,\n%L\n]",
+                "foreignKeys", annot[0], annot[1], annot[2], annot[3], annot[4], annot[5], annot[6])
+            8 -> entityAn.addMember("%L = [\n%L,\n%L,\n%L,\n%L,\n%L,\n%L,\n%L,\n%L\n]",
+                "foreignKeys", annot[0], annot[1], annot[2], annot[3], annot[4], annot[5], annot[6], annot[7])
+            9 -> entityAn.addMember("%L = [\n%L,\n%L,\n%L,\n%L,\n%L,\n%L,\n%L,\n%L,\n%L\n]",
+                "foreignKeys", annot[0], annot[1], annot[2], annot[3], annot[4], annot[5], annot[6], annot[7], annot[8])
+            10 -> entityAn.addMember("%L = [\n%L,\n%L,\n%L,\n%L,\n%L,\n%L,\n%L,\n%L,\n%L,\n%L\n]",
+                "foreignKeys", annot[0], annot[1], annot[2], annot[3], annot[4], annot[5], annot[6], annot[7], annot[8],
+                annot[9])
+            11 -> entityAn.addMember("%L = [\n%L,\n%L,\n%L,\n%L,\n%L,\n%L,\n%L,\n%L,\n%L,\n%L,\n%L\n]",
+                "foreignKeys", annot[0], annot[1], annot[2], annot[3], annot[4], annot[5], annot[6], annot[7], annot[8],
+                annot[9], annot[10])
         }
     }
 

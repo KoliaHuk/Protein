@@ -1,5 +1,3 @@
 package protein.extensions
 
-fun String.snakeCase() {
-    this.decapitalize().replace(Regex("(?<=.)([A-Z])"), "_\\l\$0")
-}
+fun String.snake() = this.replace(Regex("([^_A-Z])([A-Z])"), "\$1_\$2").toLowerCase()
