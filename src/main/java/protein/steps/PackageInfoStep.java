@@ -27,6 +27,13 @@ public class PackageInfoStep extends WizardStep<AddComponentWizardModel> {
     private JLabel packageNameLabel;
     private JTextField componentNameTextField;
     private JTextField domainTextField;
+    private JCheckBox DAOCheckBox;
+    private JCheckBox mappersCheckBox;
+    private JCheckBox databaseEntitiesCheckBox;
+    private JCheckBox syncDTOCheckBox;
+    private JCheckBox PUTMapHelperCheckBox;
+    private JCheckBox mapHelperCheckBox;
+    private JCheckBox databaseCheckBox;
     private ErrorTracking errorTracking = new BugsnagErrorTracking();
 
     @Override
@@ -136,6 +143,14 @@ public class PackageInfoStep extends WizardStep<AddComponentWizardModel> {
         );
         KotlinApiBuilder kotlinApiBuilder = new KotlinApiBuilder(configuration, errorTracking);
         kotlinApiBuilder.build();
-        kotlinApiBuilder.generateFiles();
+        kotlinApiBuilder.generateFiles(
+            syncDTOCheckBox.isSelected(),
+            databaseEntitiesCheckBox.isSelected(),
+            DAOCheckBox.isSelected(),
+            databaseCheckBox.isSelected(),
+            mappersCheckBox.isSelected(),
+            mapHelperCheckBox.isSelected(),
+            PUTMapHelperCheckBox.isSelected()
+        );
     }
 }

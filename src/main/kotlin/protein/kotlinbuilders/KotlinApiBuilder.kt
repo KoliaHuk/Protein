@@ -58,7 +58,7 @@ import java.lang.IllegalStateException
 import java.net.UnknownHostException
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.test.assertNotEquals
+import kotlin.collections.LinkedHashSet
 
 class KotlinApiBuilder(
     private val proteinApiConfiguration: ProteinApiConfiguration,
@@ -97,6 +97,8 @@ class KotlinApiBuilder(
     private val databaseEntitiesTypeSpec: ArrayList<TypeSpec> = ArrayList()
     private val daoTypeSpec: ArrayList<TypeSpec> = ArrayList()
     private lateinit var databaseTypeSpec: TypeSpec
+    private lateinit var mapeHelperTypeSpec: TypeSpec
+    private lateinit var mapPutHelperTypeSpec: TypeSpec
     private val mappersTypeSpec: ArrayList<TypeSpec> = ArrayList()
     private val enumListTypeSpec: ArrayList<TypeSpec> = ArrayList()
 
@@ -109,39 +111,61 @@ class KotlinApiBuilder(
         createDao(p)
         createDatabase(p)
         createMappers(p)
+        createMapHelper(p)
+        createPutMapHelper(p)
     }
 
     fun getGeneratedTypeSpec(): TypeSpec {
         return apiInterfaceTypeSpec
     }
 
-    fun generateFiles() {
+    fun generateFiles(
+        isSyncDto: Boolean,
+        isDatabaseEntities: Boolean,
+        isDao: Boolean,
+        isDatabase: Boolean,
+        isMappers: Boolean,
+        isHelper: Boolean,
+        isPutHelper: Boolean
+    ) {
         /*StorageUtils.generateFiles(
           proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName, apiInterfaceTypeSpec)*/
-
-        for (typeSpec in responseBodyModelListTypeSpec) {
-            StorageUtils.generateFiles(
-                proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName + ".sync.entity", typeSpec)
+        if (isSyncDto) {
+            for (typeSpec in responseBodyModelListTypeSpec) {
+                StorageUtils.generateFiles(
+                    proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName + ".sync.entity", typeSpec)
+            }
         }
-
-        for (typeSpec in databaseEntitiesTypeSpec) {
-            StorageUtils.generateFiles(
-                proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName + ".database.entity", typeSpec)
+        if (isDatabaseEntities) {
+            for (typeSpec in databaseEntitiesTypeSpec) {
+                StorageUtils.generateFiles(
+                    proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName + ".database.entity", typeSpec)
+            }
         }
-
-        for (typeSpec in daoTypeSpec) {
-            StorageUtils.generateFiles(
-                proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName + ".database.dao", typeSpec)
+        if (isDao) {
+            for (typeSpec in daoTypeSpec) {
+                StorageUtils.generateFiles(
+                    proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName + ".database.dao", typeSpec)
+            }
         }
-
-        StorageUtils.generateFiles(
-            proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName + ".database", databaseTypeSpec)
-
-        for (typeSpec in mappersTypeSpec) {
+        if (isDatabase) {
             StorageUtils.generateFiles(
-                proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName + ".mapper", typeSpec)
+                proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName + ".database", databaseTypeSpec)
         }
-
+        if (isMappers) {
+            for (typeSpec in mappersTypeSpec) {
+                StorageUtils.generateFiles(
+                    proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName + ".mapper", typeSpec)
+            }
+        }
+        if (isHelper) {
+            StorageUtils.generateFiles(
+                proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName + ".helper", mapeHelperTypeSpec)
+        }
+        if (isPutHelper) {
+            StorageUtils.generateFiles(
+                proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName + ".helper", mapPutHelperTypeSpec)
+        }
         /*for (typeSpec in enumListTypeSpec) {
           StorageUtils.generateFiles(
             proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName, typeSpec)
@@ -444,18 +468,131 @@ class KotlinApiBuilder(
                     }
                     return@joinToString "$param = entity.${it.key}"
                 }
+                val statementFrom = parameters.entries.joinToString(separator = ",\n    ", prefix = "(\n    ", postfix = "\n)") {
+                    var param = it.key
+                    if (it.value.type == REF_SWAGGER_TYPE) {
+                        return@joinToString ""
+                    }
+                    if (param == "id") {
+                        param += definition.key
+                    }
+                    return@joinToString "${it.key} = entity.$param"
+                }
 
                 val funcFromSyncToDatabase = FunSpec.builder("transform")
                     .addParameter("entity", syncEntity)
                     .addStatement("return %T%L", databaseEntity, statement)
                     .build()
+                val funcFromDatabaseToSync = FunSpec.builder("transform")
+                    .addParameter("entity", databaseEntity)
+                    .addStatement("return %T%L", syncEntity, statementFrom)
+                    .build()
 
                 modelClassTypeSpec.addFunction(funcFromSyncToDatabase)
+                modelClassTypeSpec.addFunction(funcFromDatabaseToSync)
                 mappersTypeSpec.add(modelClassTypeSpec.build())
             }
         }
 
         //return classNameList
+    }
+
+    private fun createMapHelper(packageName: String) {
+        val syncParams = ClassName("", "GetContent.SyncParams")
+
+        val ttt = Map::class.asTypeName()
+            .parameterizedBy(Int::class.asTypeName(), syncParams)
+
+        val modelClassTypeSpec = TypeSpec.classBuilder("MapHelper")
+            .primaryConstructor(FunSpec.constructorBuilder()
+                .addParameter("st", Map::class.asTypeName()
+                    .parameterizedBy(String::class.asTypeName(), ttt))
+                .build())
+
+        val map = mutableSetOf<String>()
+
+        models.forEach { entry ->
+            val name = entry.key
+            val entity = ClassName("$packageName.sync.entity", name)
+            val mapper = ClassName("$packageName.mapper", name + "EntityMapper")
+            val returnEntity = ClassName("$packageName.database.entity", name + "Entity")
+
+            val f = FunSpec.builder("map")
+                .addParameter(name.decapitalize(), entity)
+                .addParameter("mapper", mapper)
+                .returns(returnEntity)
+                .addStatement("val entity = mapper.transform(%L)", name.decapitalize())
+            entry.value.properties.forEach {
+                if (it.key.startsWith("id")) {
+                    val fieldName = if (it.key == "id") {
+                        it.key + name
+                    } else {
+                        it.key
+                    }
+                    val mapName = fieldName.substring(2).decapitalize() + "Id"
+                    map.add(mapName)
+                    f.addStatement("entity.%L = %L[entity.%L]?.localId", fieldName, mapName, fieldName)
+                }
+            }
+
+            f.addStatement("return entity")
+
+            modelClassTypeSpec.addFunction(f.build())
+        }
+
+        map.forEach {
+            val name = it.substring(0, it.length - 2).snake()
+            modelClassTypeSpec.addProperty(PropertySpec.builder(it, ttt)
+                .initializer("st[%S]?: mapOf()", name)
+                .build())
+        }
+
+        mapeHelperTypeSpec = modelClassTypeSpec.build()
+    }
+
+    private fun createPutMapHelper(packageName: String) {
+        val ttt = ClassName("", "MutableSet")
+            .parameterizedBy(Int::class.asTypeName().asNullable())
+
+        val modelClassTypeSpec = TypeSpec.classBuilder("PutMapHelper")
+
+        val map = mutableSetOf<String>()
+
+        models.forEach { entry ->
+            val name = entry.key
+            val syncEntity = ClassName("$packageName.sync.entity", name)
+            val mapper = ClassName("$packageName.mapper", name + "EntityMapper")
+            val databaseEntity = ClassName("$packageName.database.entity", name + "Entity")
+
+            val f = FunSpec.builder("map")
+                .addParameter(name.decapitalize(), databaseEntity)
+                .addParameter("mapper", mapper)
+                .returns(syncEntity)
+            entry.value.properties.forEach {
+                if (it.key.startsWith("id")) {
+                    val databaseFieldName = if (it.key == "id") {
+                        it.key + name
+                    } else {
+                        it.key
+                    }
+                    val mapName = databaseFieldName.substring(2).decapitalize() + "Id"
+                    map.add(mapName)
+                    f.addStatement("%L.add(%L.%L)", mapName, name.decapitalize(), databaseFieldName)
+                }
+            }
+
+            f.addStatement("return mapper.transform(%L)", name.decapitalize())
+
+            modelClassTypeSpec.addFunction(f.build())
+        }
+
+        map.forEach {
+            modelClassTypeSpec.addProperty(PropertySpec.builder(it, ttt)
+                .initializer("mutableSetOf()")
+                .build())
+        }
+
+        mapPutHelperTypeSpec = modelClassTypeSpec.build()
     }
 
     private fun addEmbeddedAnnotations(entityAn: AnnotationSpec.Builder, annot: List<AnnotationSpec>) {
