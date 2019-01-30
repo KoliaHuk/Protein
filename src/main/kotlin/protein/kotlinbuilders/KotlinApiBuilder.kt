@@ -10,6 +10,7 @@ import androidx.room.Query
 import com.google.gson.annotations.SerializedName
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec
@@ -58,7 +59,6 @@ import java.lang.IllegalStateException
 import java.net.UnknownHostException
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.collections.LinkedHashSet
 
 class KotlinApiBuilder(
     private val proteinApiConfiguration: ProteinApiConfiguration,
@@ -99,6 +99,8 @@ class KotlinApiBuilder(
     private lateinit var databaseTypeSpec: TypeSpec
     private lateinit var mapeHelperTypeSpec: TypeSpec
     private lateinit var mapPutHelperTypeSpec: TypeSpec
+    private val domainEntitiesSpec: ArrayList<TypeSpec> = ArrayList()
+    private val domainMappersSpec: ArrayList<TypeSpec> = ArrayList()
     private val mappersTypeSpec: ArrayList<TypeSpec> = ArrayList()
     private val enumListTypeSpec: ArrayList<TypeSpec> = ArrayList()
 
@@ -113,6 +115,8 @@ class KotlinApiBuilder(
         createMappers(p)
         createMapHelper(p)
         createPutMapHelper(p)
+        createDomainEntities(p)
+        createDomainMappers(p)
     }
 
     fun getGeneratedTypeSpec(): TypeSpec {
@@ -126,7 +130,9 @@ class KotlinApiBuilder(
         isDatabase: Boolean,
         isMappers: Boolean,
         isHelper: Boolean,
-        isPutHelper: Boolean
+        isPutHelper: Boolean,
+        isDomainEntities: Boolean,
+        isDomainMappers: Boolean
     ) {
         /*StorageUtils.generateFiles(
           proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName, apiInterfaceTypeSpec)*/
@@ -165,6 +171,18 @@ class KotlinApiBuilder(
         if (isPutHelper) {
             StorageUtils.generateFiles(
                 proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName + ".helper", mapPutHelperTypeSpec)
+        }
+        if (isDomainEntities) {
+            for (typeSpec in domainEntitiesSpec) {
+                StorageUtils.generateFiles(
+                    proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName + ".domain.model", typeSpec)
+            }
+        }
+        if (isDomainMappers) {
+            for (typeSpec in domainMappersSpec) {
+                StorageUtils.generateFiles(
+                    proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName + ".domain.mapper", typeSpec)
+            }
         }
         /*for (typeSpec in enumListTypeSpec) {
           StorageUtils.generateFiles(
@@ -343,8 +361,7 @@ class KotlinApiBuilder(
                         .addMember("\n%L = %T.CASCADE", "onUpdate", ForeignKey::class)
                         .build()
                 }
-                addEmbeddedAnnotations(entityAn, annot)
-
+                entityAn.addMember(annot.joinToString(separator = ",\n", prefix = "%L = [\n", postfix = "\n]") { "%L" }, "foreignKeys", *annot.toTypedArray())
                 modelClassTypeSpec.addAnnotation(entityAn.build())
 
                 databaseEntitiesTypeSpec.add(modelClassTypeSpec.build())
@@ -595,30 +612,146 @@ class KotlinApiBuilder(
         mapPutHelperTypeSpec = modelClassTypeSpec.build()
     }
 
-    private fun addEmbeddedAnnotations(entityAn: AnnotationSpec.Builder, annot: List<AnnotationSpec>) {
-        when (annot.size) {
-            0 -> return
-            1 -> entityAn.addMember("%L = [\n%L\n]", "foreignKeys", annot[0])
-            2 -> entityAn.addMember("%L = [\n%L,\n%L\n]", "foreignKeys", annot[0], annot[1])
-            3 -> entityAn.addMember("%L = [\n%L,\n%L,\n%L\n]", "foreignKeys", annot[0], annot[1], annot[2])
-            4 -> entityAn.addMember("%L = [\n%L,\n%L,\n%L,\n%L\n]",
-                "foreignKeys", annot[0], annot[1], annot[2], annot[3])
-            5 -> entityAn.addMember("%L = [\n%L,\n%L,\n%L,\n%L,\n%L\n]",
-                "foreignKeys", annot[0], annot[1], annot[2], annot[3], annot[4])
-            6 -> entityAn.addMember("%L = [\n%L,\n%L,\n%L,\n%L,\n%L,\n%L\n]",
-                "foreignKeys", annot[0], annot[1], annot[2], annot[3], annot[4], annot[5])
-            7 -> entityAn.addMember("%L = [\n%L,\n%L,\n%L,\n%L,\n%L,\n%L,\n%L\n]",
-                "foreignKeys", annot[0], annot[1], annot[2], annot[3], annot[4], annot[5], annot[6])
-            8 -> entityAn.addMember("%L = [\n%L,\n%L,\n%L,\n%L,\n%L,\n%L,\n%L,\n%L\n]",
-                "foreignKeys", annot[0], annot[1], annot[2], annot[3], annot[4], annot[5], annot[6], annot[7])
-            9 -> entityAn.addMember("%L = [\n%L,\n%L,\n%L,\n%L,\n%L,\n%L,\n%L,\n%L,\n%L\n]",
-                "foreignKeys", annot[0], annot[1], annot[2], annot[3], annot[4], annot[5], annot[6], annot[7], annot[8])
-            10 -> entityAn.addMember("%L = [\n%L,\n%L,\n%L,\n%L,\n%L,\n%L,\n%L,\n%L,\n%L,\n%L\n]",
-                "foreignKeys", annot[0], annot[1], annot[2], annot[3], annot[4], annot[5], annot[6], annot[7], annot[8],
-                annot[9])
-            11 -> entityAn.addMember("%L = [\n%L,\n%L,\n%L,\n%L,\n%L,\n%L,\n%L,\n%L,\n%L,\n%L,\n%L\n]",
-                "foreignKeys", annot[0], annot[1], annot[2], annot[3], annot[4], annot[5], annot[6], annot[7], annot[8],
-                annot[9], annot[10])
+    val enums = listOf(
+        "status",
+        "externalStatus",
+        "internalStatus",
+        "burialMethod",
+        "itemCategory",
+        "itemType",
+        "orderType",
+        "unit",
+        "linkageType",
+        "reportType"
+    )
+
+    private fun createDomainEntities(packageName: String) {
+        for (definition in models) {
+            val parcelize = ClassName("kotlinx.android.parcel", "Parcelize")
+            val parcelable = ClassName("android.os", "Parcelable")
+            val modelClassTypeSpec: TypeSpec.Builder = TypeSpec.classBuilder(definition.key)
+                .addModifiers(KModifier.DATA)
+                .addAnnotation(parcelize)
+                .addSuperinterface(parcelable)
+
+            if (definition.value.properties != null) {
+                val primaryConstructor = FunSpec.constructorBuilder()
+                for (modelProperty in definition.value.properties) {
+                    var typeName: TypeName = if (modelProperty.key in enums || ((modelProperty.value is StringProperty
+                            && ((modelProperty.value as StringProperty).enum != null)))) {
+                        ClassName("de.weinandit.bestatterprogramma.base.model", modelProperty.key.capitalize()).asNullable()
+                    } else {
+                        getTypeName(modelProperty)
+                    }
+                    var name = modelProperty.key
+                    var defaultName = "null"
+                    if (name.startsWith("id") && name.length > 2) {
+                        name = name.substring(2)
+                        val className = if (name.contains("Policeman")
+                            || name.contains("Clerk")
+                            || name.contains("ContactPerson")
+                            || name.contains("Guarantor")) {
+                            "PersonGroup"
+                        } else {
+                            name
+                        }
+                        defaultName = className
+                        typeName = ClassName("$packageName.domain.model", className).requiredOrNullable(modelProperty.value.required)
+                        name = name.decapitalize()
+                    }
+                    if (definition.key.contains("Group") && modelProperty.value.type == ARRAY_SWAGGER_TYPE) {
+                        val cl = ClassName("$packageName.domain.model", definition.key.replace("Group", ""))
+                        typeName = List::class.asTypeName().parameterizedBy(cl).asNonNull()
+                        defaultName = "listOf"
+                    }
+                    if (name.contains("Group")) {
+                        typeName = typeName.asNonNull()
+                    }
+                    val propertySpec = PropertySpec.builder(name, typeName)
+                        .mutable()
+                        .initializer(name)
+                        .build()
+                    val parameter = ParameterSpec.builder(name, typeName)
+                    if (typeName.nullable) {
+                        parameter.defaultValue("null")
+                    } else {
+                        parameter.defaultValue("%L()", defaultName)
+                    }
+                    primaryConstructor.addParameter(parameter.build())
+                    modelClassTypeSpec.addProperty(propertySpec)
+                }
+                modelClassTypeSpec.primaryConstructor(primaryConstructor.build())
+
+                domainEntitiesSpec.add(modelClassTypeSpec.build())
+            }
+        }
+    }
+
+    private fun createDomainMappers(packageName: String) {
+        for (definition in models) {
+            val modelClassTypeSpec: TypeSpec.Builder = TypeSpec.classBuilder(definition.key + "Mapper")
+            if (definition.value.properties != null) {
+                val domainEntity = ClassName("$packageName.domain.model", definition.key)
+                val databaseEntity = ClassName("$packageName.database.entity", definition.key + "Entity")
+
+                val parameters = definition.value.properties.filter {
+                    it.value.type != ARRAY_SWAGGER_TYPE
+                }
+                val statement = parameters.entries.joinToString(separator = ",\n    ", prefix = "(\n    ", postfix = "\n)") {
+                    var param = it.key
+                    if (it.key in enums || (it.value is StringProperty
+                            && ((it.value as StringProperty).enum != null))) {
+                        return@joinToString "$param = entity.$param?.toString()"
+                    }
+                    if (it.value.type == REF_SWAGGER_TYPE) {
+                        param = "id${param.capitalize()}"
+                        return@joinToString "$param = entity.${it.key}?.id"
+                    }
+                    if (param.startsWith("id") && param.length > 2) {
+                        var name = param.substring(2).decapitalize()
+                        if (!param.contains("Group")) {
+                            name += "?"
+                        }
+                        return@joinToString "$param = entity.$name.id"
+                    }
+                    if (param == "id") {
+                        param += definition.key
+                    }
+                    return@joinToString "$param = entity.${it.key}"
+                }
+                val classes = mutableListOf<TypeName>()
+                val mapped = parameters.entries.map {
+                    var param = it.key
+                    if (it.key in enums || (it.value is StringProperty
+                            && ((it.value as StringProperty).enum != null))) {
+                        classes.add(ClassName("de.weinandit.bestatterprogramma.base.model", param.capitalize()))
+                        return@map "$param = entity.$param?.let { %T.from(it) }"
+                    }
+                    if (param.startsWith("id") && param.length > 2 || it.value.type == REF_SWAGGER_TYPE) {
+                        return@map null
+                    }
+                    if (param == "id") {
+                        param += definition.key
+                    }
+                    return@map "${it.key} = entity.$param"
+                }.filterNotNull()
+
+                val statementFrom = mapped.joinToString(separator = ",\n    ", prefix = "(\n    ", postfix = "\n)")
+                val block = CodeBlock.of(statementFrom, *classes.toTypedArray())
+
+                val funcFromSyncToDatabase = FunSpec.builder("transform")
+                    .addParameter("entity", domainEntity)
+                    .addStatement("return %T%L", databaseEntity, statement)
+                    .build()
+                val funcFromDatabaseToSync = FunSpec.builder("transform")
+                    .addParameter("entity", databaseEntity)
+                    .addStatement("return %T%L", domainEntity, block)
+                    .build()
+
+                modelClassTypeSpec.addFunction(funcFromSyncToDatabase)
+                modelClassTypeSpec.addFunction(funcFromDatabaseToSync)
+                domainMappersSpec.add(modelClassTypeSpec.build())
+            }
         }
     }
 

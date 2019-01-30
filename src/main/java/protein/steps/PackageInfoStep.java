@@ -34,6 +34,8 @@ public class PackageInfoStep extends WizardStep<AddComponentWizardModel> {
     private JCheckBox PUTMapHelperCheckBox;
     private JCheckBox mapHelperCheckBox;
     private JCheckBox databaseCheckBox;
+    private JCheckBox domainEnitiesCheckBox;
+    private JCheckBox domainMappersCheckBox;
     private ErrorTracking errorTracking = new BugsnagErrorTracking();
 
     @Override
@@ -150,7 +152,9 @@ public class PackageInfoStep extends WizardStep<AddComponentWizardModel> {
             databaseCheckBox.isSelected(),
             mappersCheckBox.isSelected(),
             mapHelperCheckBox.isSelected(),
-            PUTMapHelperCheckBox.isSelected()
+            PUTMapHelperCheckBox.isSelected(),
+            domainEnitiesCheckBox.isSelected(),
+            domainMappersCheckBox.isSelected()
         );
     }
 }
