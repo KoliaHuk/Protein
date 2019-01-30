@@ -622,7 +622,9 @@ class KotlinApiBuilder(
         "orderType",
         "unit",
         "linkageType",
-        "reportType"
+        "reportType",
+        "receiptStatus",
+        "receiptType"
     )
 
     private fun createDomainEntities(packageName: String) {

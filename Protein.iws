@@ -2,9 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="426404f3-14cf-4cf9-be47-115388e0e4f1" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/Protein.iws" beforeDir="false" afterPath="$PROJECT_DIR$/Protein.iws" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/protein/steps/PackageInfoStep.form" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/protein/steps/PackageInfoStep.form" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/protein/steps/PackageInfoStep.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/protein/steps/PackageInfoStep.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/protein/kotlinbuilders/KotlinApiBuilder.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/protein/kotlinbuilders/KotlinApiBuilder.kt" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.gradle/" />
@@ -66,8 +63,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/kotlin/protein/kotlinbuilders/KotlinApiBuilder.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="209">
-              <caret line="641" column="124" selection-start-line="641" selection-start-column="124" selection-end-line="641" selection-end-column="124" />
+            <state relative-caret-position="362">
+              <caret line="626" column="9" selection-start-line="626" selection-start-column="9" selection-end-line="626" selection-end-column="9" />
             </state>
           </provider>
         </entry>
@@ -292,7 +289,7 @@
     <property name="Repository.Attach.JavaDocs" value="false" />
     <property name="Repository.Attach.Sources" value="false" />
     <property name="UI_DESIGNER_EDITOR_MODE.UIDesignerToolWindowManager.WIDTH" value="346" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1548860928838" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1548861251237" />
     <property name="editor.config.ad.shown" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/build.gradle" />
     <property name="project.structure.last.edited" value="Libraries" />
@@ -427,6 +424,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1176" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="Image Layers" />
       <window_info id="Designer" />
@@ -442,7 +440,7 @@
       <window_info anchor="bottom" id="Messages" sideWeight="0.49946696" weight="0.32981783" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" sideWeight="0.49840087" weight="0.32694152" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.4989339" visible="true" weight="0.32981783" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4989339" weight="0.32981783" />
       <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.4978678" weight="0.39980826" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -835,8 +833,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/kotlin/protein/kotlinbuilders/KotlinApiBuilder.kt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="209">
-          <caret line="641" column="124" selection-start-line="641" selection-start-column="124" selection-end-line="641" selection-end-column="124" />
+        <state relative-caret-position="362">
+          <caret line="626" column="9" selection-start-line="626" selection-start-column="9" selection-end-line="626" selection-end-column="9" />
         </state>
       </provider>
     </entry>
