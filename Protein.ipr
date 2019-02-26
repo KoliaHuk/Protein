@@ -215,10 +215,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Protein.iml" filepath="$PROJECT_DIR$/Protein.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Protein.iml" filepath="$PROJECT_DIR$/Protein.iml" />
       <module fileurl="file://$PROJECT_DIR$/Protein_main.iml" filepath="$PROJECT_DIR$/Protein_main.iml" group="Protein" />
-      <module fileurl="file://$PROJECT_DIR$/Protein_main.iml" filepath="$PROJECT_DIR$/Protein_main.iml" group="Protein" />
-      <module fileurl="file://$PROJECT_DIR$/Protein_test.iml" filepath="$PROJECT_DIR$/Protein_test.iml" group="Protein" />
       <module fileurl="file://$PROJECT_DIR$/Protein_test.iml" filepath="$PROJECT_DIR$/Protein_test.iml" group="Protein" />
       <module fileurl="file://$PROJECT_DIR$/src/src.iml" filepath="$PROJECT_DIR$/src/src.iml" group="src" />
     </modules>

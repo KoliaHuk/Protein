@@ -36,6 +36,7 @@ public class PackageInfoStep extends WizardStep<AddComponentWizardModel> {
     private JCheckBox databaseCheckBox;
     private JCheckBox domainEnitiesCheckBox;
     private JCheckBox domainMappersCheckBox;
+    private JCheckBox baseDaoCheckBox;
     private ErrorTracking errorTracking = new BugsnagErrorTracking();
 
     @Override
@@ -148,6 +149,7 @@ public class PackageInfoStep extends WizardStep<AddComponentWizardModel> {
         kotlinApiBuilder.generateFiles(
             syncDTOCheckBox.isSelected(),
             databaseEntitiesCheckBox.isSelected(),
+            baseDaoCheckBox.isSelected(),
             DAOCheckBox.isSelected(),
             databaseCheckBox.isSelected(),
             mappersCheckBox.isSelected(),

@@ -103,7 +103,7 @@
           </component>
         </children>
       </grid>
-      <grid id="6299c" binding="agentPanel" layout-manager="GridLayoutManager" row-count="6" column-count="6" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="0">
+      <grid id="6299c" binding="agentPanel" layout-manager="GridLayoutManager" row-count="6" column-count="7" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="0">
         <margin top="20" left="10" bottom="10" right="10"/>
         <constraints>
           <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -149,7 +149,7 @@
           </component>
           <component id="55e75" class="javax.swing.JTextField" binding="domainTextField">
             <constraints>
-              <grid row="4" column="2" row-span="1" col-span="4" vsize-policy="0" hsize-policy="6" anchor="8" fill="0" indent="0" use-parent-layout="false">
+              <grid row="4" column="2" row-span="1" col-span="5" vsize-policy="0" hsize-policy="6" anchor="8" fill="0" indent="0" use-parent-layout="false">
                 <preferred-size width="150" height="-1"/>
               </grid>
             </constraints>
@@ -169,7 +169,7 @@
           </component>
           <component id="7434c" class="javax.swing.JLabel" binding="packageNameLabel">
             <constraints>
-              <grid row="5" column="2" row-span="1" col-span="4" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="5" column="2" row-span="1" col-span="5" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text value="com.mycompany.mycomponent"/>
@@ -177,7 +177,7 @@
           </component>
           <component id="e580c" class="javax.swing.JCheckBox" binding="mappersCheckBox" default-binding="true">
             <constraints>
-              <grid row="1" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="1" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text value="Mappers"/>
@@ -210,7 +210,7 @@
           </component>
           <component id="60d4f" class="javax.swing.JCheckBox" binding="mapHelperCheckBox" default-binding="true">
             <constraints>
-              <grid row="2" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="2" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text value="MapHelper"/>
@@ -218,7 +218,7 @@
           </component>
           <component id="2e245" class="javax.swing.JCheckBox" binding="PUTMapHelperCheckBox" default-binding="true">
             <constraints>
-              <grid row="3" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="3" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text value="PUT map helper"/>
@@ -226,7 +226,7 @@
           </component>
           <component id="8ccfe" class="javax.swing.JCheckBox" binding="databaseCheckBox" default-binding="true">
             <constraints>
-              <grid row="3" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="3" column="4" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text value="Database"/>
@@ -242,10 +242,20 @@
           </component>
           <component id="27093" class="javax.swing.JCheckBox" binding="databaseEntitiesCheckBox" default-binding="true">
             <constraints>
-              <grid row="1" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="1" column="4" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text value="Database Entities"/>
+            </properties>
+          </component>
+          <component id="d1768" class="javax.swing.JCheckBox" binding="baseDaoCheckBox">
+            <constraints>
+              <grid row="2" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <enabled value="true"/>
+              <selected value="false"/>
+              <text value="Base DAO"/>
             </properties>
           </component>
         </children>
