@@ -59,10 +59,6 @@
               <text value=""/>
               <toolTipText value="Swagger Schema Url"/>
             </properties>
-            <clientProperties>
-              <caretWidth class="java.lang.Integer" value="200"/>
-              <html.disable class="java.lang.Boolean" value="false"/>
-            </clientProperties>
           </component>
           <component id="48930" class="javax.swing.JTextField" binding="serviceEndPointTextField">
             <constraints>

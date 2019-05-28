@@ -8,6 +8,7 @@ import protein.common.SettingsManager;
 import protein.kotlinbuilders.KotlinApiBuilder;
 import protein.kotlinbuilders.ProteinApiConfiguration;
 import protein.tracking.BugsnagErrorTracking;
+import protein.tracking.DialogErrorTracking;
 import protein.tracking.ErrorTracking;
 
 import javax.swing.*;
@@ -37,7 +38,7 @@ public class PackageInfoStep extends WizardStep<AddComponentWizardModel> {
     private JCheckBox domainEnitiesCheckBox;
     private JCheckBox domainMappersCheckBox;
     private JCheckBox baseDaoCheckBox;
-    private ErrorTracking errorTracking = new BugsnagErrorTracking();
+    private ErrorTracking errorTracking = new DialogErrorTracking();// new BugsnagErrorTracking();
 
     @Override
     public JComponent prepare(WizardNavigationState wizardNavigationState) {

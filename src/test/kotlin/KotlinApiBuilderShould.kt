@@ -38,7 +38,7 @@ class KotlinApiBuilderShould {
 
     private val juvoSchemaProteinConfig = ProteinApiConfiguration(
         "",
-        "https://api.weinand.it:5002/swagger/v1/swagger.json",
+        "https://api.weinand.it:8002/swagger/v1/swagger.json",
         ConfigurationForTests.PACKAGE_NAME,
         ConfigurationForTests.COMPONENT_NAME,
         ConfigurationForTests.MODULE_NAME,

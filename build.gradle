@@ -92,7 +92,7 @@ publishPlugin {
 patchPluginXml {
     version buildVersion
     sinceBuild sinceVersion
-    untilBuild intelliJVersion
+    //untilBuild intelliJVersion
     pluginDescription new File('media/plugin_description.html').text
     changeNotes new File('CHANGELOG.md').text
 }
@@ -151,6 +151,10 @@ dependencies {
         exclude group: 'org.slf4j'
     }
     compile("io.swagger:swagger-parser:1.0.33") {
+        exclude group: 'org.slf4j'
+    }
+
+    compile("io.swagger.parser.v3:swagger-parser:2.0.12") {
         exclude group: 'org.slf4j'
     }
 

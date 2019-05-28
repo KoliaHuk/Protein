@@ -28,9 +28,6 @@ import io.swagger.models.HttpMethod
 import io.swagger.models.ModelImpl
 import io.swagger.models.Operation
 import io.swagger.models.RefModel
-import io.swagger.models.ArrayModel
-import io.swagger.models.Model
-import io.swagger.models.Swagger
 import io.swagger.models.parameters.BodyParameter
 import io.swagger.models.parameters.Parameter
 import io.swagger.models.parameters.PathParameter
@@ -38,21 +35,20 @@ import io.swagger.models.parameters.QueryParameter
 import io.swagger.models.properties.ArrayProperty
 import io.swagger.models.properties.DoubleProperty
 import io.swagger.models.properties.FloatProperty
-import io.swagger.models.properties.IntegerProperty
 import io.swagger.models.properties.LongProperty
-import io.swagger.models.properties.Property
 import io.swagger.models.properties.RefProperty
 import io.swagger.models.properties.StringProperty
-import io.swagger.parser.SwaggerParser
+import io.swagger.v3.oas.models.OpenAPI
+import io.swagger.v3.oas.models.media.ArraySchema
+import io.swagger.v3.oas.models.media.IntegerSchema
+import io.swagger.v3.oas.models.media.ObjectSchema
+import io.swagger.v3.oas.models.media.Schema
+import io.swagger.v3.parser.OpenAPIV3Parser
+import io.swagger.v3.parser.util.RefUtils
 import protein.common.StorageUtils
 import protein.extensions.snake
 import protein.tracking.ErrorTracking
 import retrofit2.http.Body
-import retrofit2.http.DELETE
-import retrofit2.http.GET
-import retrofit2.http.PATCH
-import retrofit2.http.POST
-import retrofit2.http.PUT
 import retrofit2.http.Path
 import java.io.FileNotFoundException
 import java.lang.IllegalStateException
@@ -74,28 +70,28 @@ class KotlinApiBuilder(
         const val REF_SWAGGER_TYPE = "ref"
     }
 
-    private val swaggerModel: Swagger = try {
+    private val swaggerModel: OpenAPI = try {
         if (!proteinApiConfiguration.swaggerUrl.isEmpty()) {
-            SwaggerParser().read(proteinApiConfiguration.swaggerUrl)
+            OpenAPIV3Parser().read(proteinApiConfiguration.swaggerUrl)
         } else {
-            SwaggerParser().read(proteinApiConfiguration.swaggerFile)
+            OpenAPIV3Parser().read(proteinApiConfiguration.swaggerFile)
         }
     } catch (unknown: UnknownHostException) {
         errorTracking.logException(unknown)
-        Swagger()
+        OpenAPI()
     } catch (illegal: IllegalStateException) {
         errorTracking.logException(illegal)
-        Swagger()
+        OpenAPI()
     } catch (notFound: FileNotFoundException) {
         errorTracking.logException(notFound)
-        Swagger()
+        OpenAPI()
     }
 
     private lateinit var apiInterfaceTypeSpec: TypeSpec
-    private val models: MutableMap<String, Model> = mutableMapOf()
-    private val linkModels: MutableMap<String, Model> = mutableMapOf()
-    private val modelsWithLinks: MutableMap<String, Model> = mutableMapOf()
-    private val responseBodyModelListTypeSpec: ArrayList<TypeSpec> = ArrayList()
+    private val models: MutableMap<String, Schema<Any>> = mutableMapOf()
+    private val linkModels: MutableMap<String, Schema<Any>> = mutableMapOf()
+    private val modelsWithLinks: MutableMap<String, Schema<Any>> = mutableMapOf()
+    private val syncEntityModelListTypeSpec: ArrayList<TypeSpec> = ArrayList()
     private val databaseEntitiesTypeSpec: ArrayList<TypeSpec> = ArrayList()
     private val baseDaoTypeSpec: ArrayList<TypeSpec> = ArrayList()
     private val daoTypeSpec: ArrayList<TypeSpec> = ArrayList()
@@ -111,7 +107,7 @@ class KotlinApiBuilder(
         filterModels()
         val p = proteinApiConfiguration.packageName
 
-        createApiResponseBodyModel()
+        createSyncEntityModels()
         createDatabaseEntities(p)
         createDao(p)
         createDatabase(p)
@@ -141,7 +137,7 @@ class KotlinApiBuilder(
         /*StorageUtils.generateFiles(
           proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName, apiInterfaceTypeSpec)*/
         if (isSyncDto) {
-            for (typeSpec in responseBodyModelListTypeSpec) {
+            for (typeSpec in syncEntityModelListTypeSpec) {
                 StorageUtils.generateFiles(
                     proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName + ".sync.entity", typeSpec)
             }
@@ -161,7 +157,7 @@ class KotlinApiBuilder(
         if (isDao) {
             for (typeSpec in daoTypeSpec) {
                 StorageUtils.generateFiles(
-                    proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName + ".database.dao", typeSpec)
+                    proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName + ".database.dao.temp", typeSpec)
             }
         }
         if (isDatabase) {
@@ -206,7 +202,7 @@ class KotlinApiBuilder(
     }
 
     private fun addModelEnums() {
-        if (swaggerModel.definitions != null && !swaggerModel.definitions.isEmpty()) {
+        /*if (swaggerModel.definitions != null && !swaggerModel.definitions.isEmpty()) {
             for (definition in swaggerModel.definitions) {
                 if (definition.value != null && definition.value.properties != null) {
                     for (modelProperty in definition.value.properties) {
@@ -225,11 +221,11 @@ class KotlinApiBuilder(
                     }
                 }
             }
-        }
+        }*/
     }
 
     private fun addOperationResponseEnums() {
-        if (swaggerModel.paths != null && !swaggerModel.paths.isEmpty()) {
+        /*if (swaggerModel.paths != null && !swaggerModel.paths.isEmpty()) {
             for (path in swaggerModel.paths) {
                 for (operation in path.value.operationMap) {
                     try {
@@ -251,11 +247,11 @@ class KotlinApiBuilder(
                     }
                 }
             }
-        }
+        }*/
     }
 
     private fun filterModels() {
-        if (swaggerModel.definitions != null && !swaggerModel.definitions.isEmpty()) {
+        if (swaggerModel.components.schemas != null && swaggerModel.components.schemas.isNotEmpty()) {
             val types = arrayListOf<String>()
             types.add("SyncData")
             var i = 0
@@ -265,12 +261,13 @@ class KotlinApiBuilder(
                 val key = name.replace(Regex("SyncDto\\b|Dto\\b"), "")
                 models[key] = definition
                 if (key.contains("Group")) {
-                    val link = ModelImpl()
-                    val prop = IntegerProperty()
-                    prop.required = true
+                    val link = ObjectSchema()
+                    val prop = IntegerSchema()
+                    prop.nullable = false
                     val withoutGroup = key.replace("Group", "")
-                    link.addProperty("id$withoutGroup", prop)
-                    link.addProperty("id$key", prop)
+                    link.properties = mutableMapOf()
+                    link.properties["id$withoutGroup"] = prop
+                    link.properties["id$key"] = prop
                     linkModels[key + "Link"] = link
                 }
                 findRefs(definition, types)
@@ -283,7 +280,7 @@ class KotlinApiBuilder(
 
     private val syncDtoPostfix = "Dto"
 
-    private fun createApiResponseBodyModel() {
+    private fun createSyncEntityModels() {
         for (definition in models) {
             val modelClassTypeSpec: TypeSpec.Builder = TypeSpec.classBuilder(definition.key + syncDtoPostfix).addModifiers(KModifier.DATA)
             if (definition.value.properties != null) {
@@ -314,19 +311,23 @@ class KotlinApiBuilder(
                 }
                 modelClassTypeSpec.primaryConstructor(primaryConstructor.build())
 
-                responseBodyModelListTypeSpec.add(modelClassTypeSpec.build())
+                syncEntityModelListTypeSpec.add(modelClassTypeSpec.build())
             }
         }
-        responseBodyModelListTypeSpec
+        syncEntityModelListTypeSpec
     }
 
     private fun createDatabaseEntities(packageName: String): List<String> {
         val classNameList = ArrayList<String>()
         val baseEntityInterface = ClassName("$packageName.database.entity", "BaseEntity")
         val deletableEntityInterface = ClassName("$packageName.database.entity", "DeletableEntity")
+        val sharedInterface = ClassName("$packageName.database.entity", "SharedData")
 
         for (definition in modelsWithLinks) {
             val modelName = definition.key
+
+            if (skipSyncDataModels(modelName)) continue // skip
+
             val modelClassTypeSpec: TypeSpec.Builder = TypeSpec.classBuilder(modelName).addModifiers(KModifier.DATA)
             classNameList.add(modelName)
 
@@ -343,10 +344,11 @@ class KotlinApiBuilder(
                     var databasePropertyName = propertyName
                     val typeName = if (modelProperty.value.type == REF_SWAGGER_TYPE) {
                         propertyName = "id${propertyName.capitalize()}"
-                        Int::class.asTypeName().requiredOrNullable(modelProperty.value.required)
+                        Int::class.asTypeName().requiredOrNullable(modelProperty.value.nullable)
                     } else if (propertyName in enums || ((modelProperty.value is StringProperty
                             && ((modelProperty.value as StringProperty).enum != null)))) {
-                        ClassName("de.weinandit.bestatterprogramma.base.model", propertyName.capitalize()).asNullable()
+                        val resolvedName = resolveEnumNameMatch(propertyName, modelName)
+                        ClassName("de.weinandit.bestatterprogramma.base.model", resolvedName.capitalize()).asNullable()
                     } else {
                         getTypeName(modelProperty)
                     }
@@ -380,10 +382,16 @@ class KotlinApiBuilder(
                         .mutable()
                         .build()
                     val parameter = ParameterSpec.builder(propertyName, typeName)
-                    if (modelProperty.value.required) {
+                    if (modelProperty.value.nullable == false) {
                         parameter.defaultValue("%L", 0)
                     } else {
-                        parameter.defaultValue("null")
+                        if (modelProperty.key == "isShared") {
+                            parameter.defaultValue("false")
+                            modelClassTypeSpec.addSuperinterface(sharedInterface)
+                            parameter.addModifiers(KModifier.OVERRIDE)
+                        } else {
+                            parameter.defaultValue("null")
+                        }
                     }
                     primaryConstructor.addParameter(parameter.build())
                     modelClassTypeSpec.addProperty(propertySpec)
@@ -401,21 +409,15 @@ class KotlinApiBuilder(
 
                 val indices = mutableListOf<AnnotationSpec>()
                 val foreignKeysAnnotations = foreignKeys.map {
-                    val parent = if (it.contains("ContactPersonGroup")
-                    || it.contains("PolicemanGroup")
-                    || it.contains("GuarantorGroup")
-                    || it.contains("ClerkGroup")) {
-                        "idPersonGroup"
-                    } else {
-                        it
-                    }
-                    val entityClass = ClassName("$packageName.database.entity", parent.substring(2))
+                    val parent = it
+                    val resolvedParent = resolveEntityNameMatch(parent.substring(2))
+                    val entityClass = ClassName("$packageName.database.entity", resolvedParent)
                     indices.add(AnnotationSpec.builder(Index::class)
                         .addMember("%L = arrayOf(%S)", "value", it.snake())
                         .build())
                     AnnotationSpec.builder(ForeignKey::class)
                         .addMember("%L = %T::class", "entity", entityClass)
-                        .addMember("\n%L = arrayOf(%S)", "parentColumns", parent.snake())
+                        .addMember("\n%L = arrayOf(%S)", "parentColumns", "id_${resolvedParent.snake()}")
                         .addMember("\n%L = arrayOf(%S)", "childColumns", it.snake())
                         .addMember("\n%L = %T.CASCADE", "onDelete", ForeignKey::class)
                         .addMember("\n%L = %T.CASCADE", "onUpdate", ForeignKey::class)
@@ -438,8 +440,11 @@ class KotlinApiBuilder(
         val liveData = ClassName("androidx.lifecycle", "LiveData")
         for (definition in modelsWithLinks) {
             val baseDao = ClassName("de.weinandit.bestatterprogramma.modules.database.dao.base", "BaseDao")
-            val daseEntityDao = ClassName("de.weinandit.bestatterprogramma.modules.database.dao.base", "BaseEntityDao")
+            val baseEntityDao = ClassName("de.weinandit.bestatterprogramma.modules.database.dao.base", "BaseEntityDao")
             val entityName = definition.key
+
+            if (skipSyncDataModels(entityName)) continue // skip
+
             val snakeCaseName = entityName.snake()
             val parameterType = ClassName("$packageName.database.entity", entityName)
             val modelClassTypeSpec = TypeSpec.interfaceBuilder(entityName + "BaseDao")
@@ -457,6 +462,24 @@ class KotlinApiBuilder(
                     .addParameter("id", Int::class)
                     .build())
 
+                modelClassTypeSpec.addFunction(FunSpec.builder("findByIdSync")
+                    .addModifiers(KModifier.ABSTRACT, KModifier.OVERRIDE)
+                    .returns(parameterType.asNullable())
+                    .addAnnotation(AnnotationSpec.builder(Query::class)
+                        .addMember("%S", "SELECT * FROM `$snakeCaseName` WHERE id_$snakeCaseName = :id")
+                        .build())
+                    .addParameter("id", Int::class)
+                    .build())
+
+                modelClassTypeSpec.addFunction(FunSpec.builder("findByIdIn")
+                    .addModifiers(KModifier.ABSTRACT, KModifier.OVERRIDE)
+                    .returns(liveData.parameterizedBy(List::class.asTypeName().parameterizedBy(parameterType)))
+                    .addAnnotation(AnnotationSpec.builder(Query::class)
+                        .addMember("%S", "SELECT * FROM `$snakeCaseName` WHERE id_$snakeCaseName IN (:id)")
+                        .build())
+                    .addParameter("id", List::class.asTypeName().parameterizedBy(Int::class.asTypeName()))
+                    .build())
+
                 modelClassTypeSpec.addFunction(FunSpec.builder("findAll")
                     .addModifiers(KModifier.ABSTRACT, KModifier.OVERRIDE)
                     .returns(liveData.parameterizedBy(List::class.asTypeName().parameterizedBy(parameterType)))
@@ -465,8 +488,16 @@ class KotlinApiBuilder(
                         .build())
                     .build())
 
-                if (definition.value.properties.containsKey("modified")) {
-                    modelClassTypeSpec.addSuperinterface(daseEntityDao.parameterizedBy(parameterType))
+                modelClassTypeSpec.addFunction(FunSpec.builder("findAllSync")
+                    .addModifiers(KModifier.ABSTRACT, KModifier.OVERRIDE)
+                    .returns(List::class.asTypeName().parameterizedBy(parameterType))
+                    .addAnnotation(AnnotationSpec.builder(Query::class)
+                        .addMember("%S", "SELECT * FROM `$snakeCaseName`")
+                        .build())
+                    .build())
+
+                if (definition.value.properties?.containsKey("modified") == true) {
+                    modelClassTypeSpec.addSuperinterface(baseEntityDao.parameterizedBy(parameterType))
 
                     modelClassTypeSpec.addFunction(FunSpec.builder("findSinceBefore")
                         .addModifiers(KModifier.ABSTRACT, KModifier.OVERRIDE)
@@ -558,6 +589,9 @@ class KotlinApiBuilder(
 
         for (definition in models) {
             val entityName = definition.key
+
+            if (skipSyncDataModels(entityName)) continue // skip
+
             val modelClassTypeSpec: TypeSpec.Builder = TypeSpec.classBuilder(entityName + "Mapper")
             classNameList.add(entityName)
 
@@ -583,9 +617,10 @@ class KotlinApiBuilder(
                 val classes = mutableListOf<TypeName>()
                 val mapped = parameters.entries.map {
                     val param = it.key
+                    val enumName = resolveEnumNameMatch(param, entityName)
                     if (it.key in enums || (it.value is StringProperty
                             && ((it.value as StringProperty).enum != null))) {
-                        classes.add(ClassName("de.weinandit.bestatterprogramma.base.model", param.capitalize()))
+                        classes.add(ClassName("de.weinandit.bestatterprogramma.base.model", enumName.capitalize()))
                         return@map "$param = entity.$param?.let { %T.from(it) }"
                     }
                     if (it.value.type == REF_SWAGGER_TYPE) {
@@ -615,21 +650,23 @@ class KotlinApiBuilder(
     }
 
     private fun createMapHelper(packageName: String) {
-        val syncParams = ClassName("", "GetContent.SyncParams")
+        val syncParams = ClassName("$packageName.sync.content", "GetContent").nestedClass("SyncParams")
 
         val ttt = Map::class.asTypeName()
             .parameterizedBy(Int::class.asTypeName(), syncParams)
 
         val modelClassTypeSpec = TypeSpec.classBuilder("MapHelper")
             .primaryConstructor(FunSpec.constructorBuilder()
-                .addParameter("st", Map::class.asTypeName()
+                .addParameter("guid", Map::class.asTypeName()
                     .parameterizedBy(String::class.asTypeName(), ttt))
                 .build())
+            .addModifiers(KModifier.OPEN)
 
         val map = mutableSetOf<String>()
 
         models.forEach { entry ->
             val name = entry.key
+            if (skipSyncDataModels(name)) return@forEach // skip
             val entity = ClassName("$packageName.sync.entity", name + syncDtoPostfix)
             val mapper = ClassName("$packageName.sync.mapper", name + "Mapper")
             val returnEntity = ClassName("$packageName.database.entity", name)
@@ -639,14 +676,15 @@ class KotlinApiBuilder(
                 .addParameter("mapper", mapper)
                 .returns(returnEntity)
                 .addStatement("val entity = mapper.map(%L)", name.decapitalize())
-            entry.value.properties.forEach {
-                if (it.key.startsWith("id")) {
+            entry.value.properties?.forEach {
+                if (it.key.startsWith("id") && it.value.type == INTEGER_SWAGGER_TYPE) {
                     val fieldName = if (it.key == "id") {
                         it.key + name
                     } else {
                         it.key
                     }
-                    val mapName = fieldName.substring(2).decapitalize() + "Id"
+                    val field = fieldName.substring(2)
+                    val mapName = resolveEntityNameMatch(field).decapitalize() + "Id"
                     map.add(mapName)
                     f.addStatement("entity.%L = %L[entity.%L]?.localId", it.key, mapName, it.key)
                 }
@@ -660,23 +698,54 @@ class KotlinApiBuilder(
         map.forEach {
             val name = it.substring(0, it.length - 2).snake()
             modelClassTypeSpec.addProperty(PropertySpec.builder(it, ttt)
-                .initializer("st[%S]?: mapOf()", name)
+                .initializer("guid[%S]?: mapOf()", name)
                 .build())
         }
 
         mapHelperTypeSpec = modelClassTypeSpec.build()
     }
 
+    private fun resolveEntityNameMatch(field: String): String {
+        return when(field) {
+            "Taxinfo" -> "TaxInfo"
+            "ContactPerson",
+            "CreatorPerson" -> "Person"
+            "SecondPayer" -> "Payer"
+            "Type" -> "ItemType"
+            "Category" -> "ItemCategory"
+            "ContactFrom" -> "Contact"
+            "ReceiptFrom" -> "Receipt"
+            "HeadOfficeCompany" -> "Company"
+            "ReportTemplate" -> "Report"
+            "ContactPersonGroup" -> "PersonGroup"
+            else -> field
+        }
+    }
+
+    private fun resolveEnumNameMatch(field: String, entity: String): String {
+        return when(entity to field) {
+            "Fax" to "category" -> "FaxCategory"
+            "Phone" to "category" -> "PhoneCategory"
+            "Item" to "group" -> "ItemGroup"
+            "OrderItem" to "group" -> "ItemGroup"
+            else -> field
+        }
+    }
+
+    private fun skipSyncDataModels(name: String): Boolean = (name == "SyncData" || name == "SyncMap")
+
     private fun createPutMapHelper(packageName: String) {
         val ttt = ClassName("", "MutableSet")
             .parameterizedBy(Int::class.asTypeName().asNullable())
 
         val modelClassTypeSpec = TypeSpec.classBuilder("PutMapHelper")
+            .addModifiers(KModifier.OPEN)
 
         val map = mutableSetOf<String>()
 
         models.forEach { entry ->
             val name = entry.key
+            if (skipSyncDataModels(name)) return@forEach // skip
             val syncEntity = ClassName("$packageName.sync.entity", name + syncDtoPostfix)
             val mapper = ClassName("$packageName.sync.mapper", name + "Mapper")
             val databaseEntity = ClassName("$packageName.database.entity", name)
@@ -685,14 +754,15 @@ class KotlinApiBuilder(
                 .addParameter(name.decapitalize(), databaseEntity)
                 .addParameter("mapper", mapper)
                 .returns(syncEntity)
-            entry.value.properties.forEach {
-                if (it.key.startsWith("id")) {
+            entry.value.properties?.forEach {
+                if (it.key.startsWith("id") && it.value.type == INTEGER_SWAGGER_TYPE) {
                     val databaseFieldName = if (it.key == "id") {
                         it.key + name
                     } else {
                         it.key
                     }
-                    val mapName = databaseFieldName.substring(2).decapitalize() + "Id"
+                    val field = databaseFieldName.substring(2)
+                    val mapName = resolveEntityNameMatch(field).decapitalize() + "Id"
                     map.add(mapName)
                     f.addStatement("%L.add(%L.%L)", mapName, name.decapitalize(), it.key)
                 }
@@ -763,7 +833,7 @@ class KotlinApiBuilder(
                             name
                         }
                         defaultName = className
-                        typeName = ClassName("$packageName.domain.model", className).requiredOrNullable(modelProperty.value.required)
+                        typeName = ClassName("$packageName.domain.model", className).requiredOrNullable(modelProperty.value.nullable)
                         name = name.decapitalize()
                     }
                     if (definition.key.contains("Group") && modelProperty.value.type == ARRAY_SWAGGER_TYPE) {
@@ -862,21 +932,21 @@ class KotlinApiBuilder(
         }
     }
 
-    private fun findDefinition(name: String): Model {
-        return swaggerModel.definitions[name] ?: throw IllegalArgumentException()
+    private fun findDefinition(name: String): Schema<Any> {
+        return swaggerModel.components.schemas[name] ?: throw IllegalArgumentException()
     }
 
-    private fun findRefs(model: Model, types: ArrayList<String>) {
-        model.properties.forEach { _, property ->
-            if (property.type == REF_SWAGGER_TYPE) {
-                val ref = (property as RefProperty).simpleRef
+    private fun findRefs(model: Schema<Any>, types: ArrayList<String>) {
+        model.properties?.forEach { _, property ->
+            if (property.`$ref` != null) {
+                val ref = RefUtils.computeDefinitionName(property.`$ref`)
                 if (!types.contains(ref)) types.add(ref)
             }
             if (property.type == ARRAY_SWAGGER_TYPE) {
-                val arrayProperty = property as ArrayProperty
-                val items = arrayProperty.items
-                if (items is RefProperty) {
-                    val ref = items.simpleRef
+                val arrayProperty = property as ArraySchema?
+                val items = arrayProperty?.items
+                if (items?.`$ref` != null) {
+                    val ref = RefUtils.computeDefinitionName(items.`$ref`)
                     if (!types.contains(ref)) types.add(ref)
                 }
             }
@@ -894,7 +964,7 @@ class KotlinApiBuilder(
     }
 
     private fun addApiPathMethods(apiInterfaceTypeSpec: TypeSpec.Builder, classNameList: List<String>) {
-        if (swaggerModel.paths != null && !swaggerModel.paths.isEmpty()) {
+        /*if (swaggerModel.paths != null && !swaggerModel.paths.isEmpty()) {
             for (path in swaggerModel.paths) {
                 for (operation in path.value.operationMap) {
 
@@ -931,31 +1001,32 @@ class KotlinApiBuilder(
                     }
                 }
             }
-        }
+        }*/
     }
 
     private fun getMethodParametersDocs(operation: MutableMap.MutableEntry<HttpMethod, Operation>): Iterable<String> {
         return operation.value.parameters.filterNot { it.description.isNullOrBlank() }.map { "@param ${it.name} ${it.description}" }
     }
 
-    private fun getTypeName(modelProperty: MutableMap.MutableEntry<String, Property>): TypeName {
+    private fun getTypeName(modelProperty: MutableMap.MutableEntry<String, Schema<Any>>): TypeName {
         val property = modelProperty.value
         return when {
-            property.type == REF_SWAGGER_TYPE ->
-                TypeVariableName.invoke((property as RefProperty).simpleRef).requiredOrNullable(property.required)
+            property.`$ref` != null ->
+                TypeVariableName.invoke(RefUtils.computeDefinitionName(property.`$ref`)).requiredOrNullable(property.nullable)
 
             property.type == ARRAY_SWAGGER_TYPE -> {
-                val arrayProperty = property as ArrayProperty
-                getTypedArray(arrayProperty.items).requiredOrNullable(arrayProperty.required)
+                val arrayProperty = property as ArraySchema
+                getTypedArray(arrayProperty.items).requiredOrNullable(arrayProperty.nullable)
             }
-            else -> getKotlinClassTypeName(property.type, property.format).requiredOrNullable(property.required)
+            else -> getKotlinClassTypeName(property).requiredOrNullable(property.nullable)
         }
     }
 
     private fun getMethodParameters(
         operation: MutableMap.MutableEntry<HttpMethod, Operation>
     ): Iterable<ParameterSpec> {
-        return operation.value.parameters.mapNotNull { parameter ->
+        return linkedSetOf()
+        /*return operation.value.parameters.mapNotNull { parameter ->
             // Transform parameters in the format foo.bar to fooBar
             val name = parameter.name.split('.').mapIndexed { index, s -> if (index > 0) s.capitalize() else s }.joinToString("")
             when (parameter.`in`) {
@@ -979,7 +1050,7 @@ class KotlinApiBuilder(
                 }
                 else -> null
             }
-        }
+        }*/
     }
 
     private fun getBodyParameterSpec(parameter: Parameter): TypeName {
@@ -989,7 +1060,7 @@ class KotlinApiBuilder(
         return when (schema) {
             is RefModel -> ClassName.bestGuess(schema.simpleRef.capitalize()).requiredOrNullable(parameter.required)
 
-            is ArrayModel -> getTypedArray(schema.items).requiredOrNullable(parameter.required)
+            //is ArrayModel -> getTypedArray(schema.items).requiredOrNullable(parameter.required)
 
             else -> {
                 val bodyParameter1 = parameter.schema as? ModelImpl ?: ModelImpl()
@@ -1003,19 +1074,19 @@ class KotlinApiBuilder(
         }
     }
 
-    private fun getTypedArray(items: Property): TypeName {
+    private fun getTypedArray(items: Schema<*>): TypeName {
         val typeProperty = when (items) {
             is LongProperty -> TypeVariableName.invoke(Long::class.simpleName!!)
-            is IntegerProperty -> TypeVariableName.invoke(Int::class.simpleName!!)
+            is IntegerSchema -> TypeVariableName.invoke(Int::class.simpleName!!)
             is FloatProperty -> TypeVariableName.invoke(Float::class.simpleName!!)
             is DoubleProperty -> TypeVariableName.invoke(Float::class.simpleName!!)
             is RefProperty -> TypeVariableName.invoke(items.simpleRef)
-            else -> getKotlinClassTypeName(items.type, items.format)
+            else -> getKotlinClassTypeName(items)
         }
         return List::class.asClassName().parameterizedBy(typeProperty)
     }
 
-    private fun TypeName.requiredOrNullable(required: Boolean) = if (required) this else asNullable()
+    private fun TypeName.requiredOrNullable(nullable: Boolean?) = if (nullable == false) this else asNullable()
 
     private fun getReturnedClass(
         operation: MutableMap.MutableEntry<HttpMethod, Operation>,
@@ -1062,7 +1133,12 @@ class KotlinApiBuilder(
         return className
     }
 
-    private fun getKotlinClassTypeName(type: String, format: String? = null): TypeName {
+    private fun getKotlinClassTypeName(schema: Schema<*>): TypeName {
+        val type = schema.type
+        val format = schema.format
+        if (schema.`$ref` != null) {
+            return TypeVariableName.invoke(RefUtils.computeDefinitionName(schema.`$ref`))
+        }
         return when (type) {
             ARRAY_SWAGGER_TYPE -> TypeVariableName.invoke(List::class.simpleName!!)
             STRING_SWAGGER_TYPE -> {
@@ -1078,7 +1154,7 @@ class KotlinApiBuilder(
                     else -> TypeVariableName.invoke(Int::class.simpleName!!)
                 }
             }
-            else -> TypeVariableName.invoke(type.capitalize())
+            else -> TypeVariableName.invoke(type?.capitalize()?: "")
         }
     }
 
@@ -1098,7 +1174,7 @@ class KotlinApiBuilder(
 
     fun getGeneratedModelsString(): String {
         var generated = ""
-        for (typeSpec in responseBodyModelListTypeSpec) {
+        for (typeSpec in syncEntityModelListTypeSpec) {
             generated += StorageUtils.generateString(proteinApiConfiguration.packageName, typeSpec)
         }
         return generated
