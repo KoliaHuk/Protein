@@ -30,8 +30,6 @@ import io.swagger.models.Operation
 import io.swagger.models.RefModel
 import io.swagger.models.parameters.BodyParameter
 import io.swagger.models.parameters.Parameter
-import io.swagger.models.parameters.PathParameter
-import io.swagger.models.parameters.QueryParameter
 import io.swagger.models.properties.ArrayProperty
 import io.swagger.models.properties.DoubleProperty
 import io.swagger.models.properties.FloatProperty
@@ -40,16 +38,17 @@ import io.swagger.models.properties.RefProperty
 import io.swagger.models.properties.StringProperty
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.media.ArraySchema
+import io.swagger.v3.oas.models.media.DateSchema
+import io.swagger.v3.oas.models.media.DateTimeSchema
 import io.swagger.v3.oas.models.media.IntegerSchema
 import io.swagger.v3.oas.models.media.ObjectSchema
 import io.swagger.v3.oas.models.media.Schema
+import io.swagger.v3.oas.models.media.StringSchema
 import io.swagger.v3.parser.OpenAPIV3Parser
 import io.swagger.v3.parser.util.RefUtils
 import protein.common.StorageUtils
 import protein.extensions.snake
 import protein.tracking.ErrorTracking
-import retrofit2.http.Body
-import retrofit2.http.Path
 import java.io.FileNotFoundException
 import java.lang.IllegalStateException
 import java.net.UnknownHostException
@@ -91,6 +90,8 @@ class KotlinApiBuilder(
     private val models: MutableMap<String, Schema<Any>> = mutableMapOf()
     private val linkModels: MutableMap<String, Schema<Any>> = mutableMapOf()
     private val modelsWithLinks: MutableMap<String, Schema<Any>> = mutableMapOf()
+    private var mods: List<ModelEntity> = listOf()
+    private var modLinks: List<ModelEntity> = listOf()
     private val syncEntityModelListTypeSpec: ArrayList<TypeSpec> = ArrayList()
     private val databaseEntitiesTypeSpec: ArrayList<TypeSpec> = ArrayList()
     private val baseDaoTypeSpec: ArrayList<TypeSpec> = ArrayList()
@@ -105,6 +106,8 @@ class KotlinApiBuilder(
 
     fun build() {
         filterModels()
+        mods = convert(models)
+        modLinks = convert(modelsWithLinks)
         val p = proteinApiConfiguration.packageName
 
         createSyncEntityModels()
@@ -250,62 +253,35 @@ class KotlinApiBuilder(
         }*/
     }
 
-    private fun filterModels() {
-        if (swaggerModel.components.schemas != null && swaggerModel.components.schemas.isNotEmpty()) {
-            val types = arrayListOf<String>()
-            types.add("SyncData")
-            var i = 0
-            while (i < types.size) {
-                val name = types[i]
-                val definition = findDefinition(name)
-                val key = name.replace(Regex("SyncDto\\b|Dto\\b"), "")
-                models[key] = definition
-                if (key.contains("Group")) {
-                    val link = ObjectSchema()
-                    val prop = IntegerSchema()
-                    prop.nullable = false
-                    val withoutGroup = key.replace("Group", "")
-                    link.properties = mutableMapOf()
-                    link.properties["id$withoutGroup"] = prop
-                    link.properties["id$key"] = prop
-                    linkModels[key + "Link"] = link
-                }
-                findRefs(definition, types)
-                i++
-            }
-        }
-        modelsWithLinks.putAll(models)
-        modelsWithLinks.putAll(linkModels)
-    }
-
     private val syncDtoPostfix = "Dto"
 
     private fun createSyncEntityModels() {
-        for (definition in models) {
-            val modelClassTypeSpec: TypeSpec.Builder = TypeSpec.classBuilder(definition.key + syncDtoPostfix).addModifiers(KModifier.DATA)
-            if (definition.value.properties != null) {
+        for (definition in mods) {
+            val modelClassTypeSpec: TypeSpec.Builder
+                = TypeSpec.classBuilder(definition.name + syncDtoPostfix)
+                .addModifiers(KModifier.DATA)
+            if (definition is ObjectEntity) {
                 val primaryConstructor = FunSpec.constructorBuilder()
-                for (modelProperty in definition.value.properties) {
-                    var typeName: TypeName = getTypeName(modelProperty)
-                    var defaultName: CodeBlock = CodeBlock.of("null")
-                    if (modelProperty.value.type == ARRAY_SWAGGER_TYPE) {
-                        defaultName = CodeBlock.of("%L()", "listOf")
-                        typeName = typeName.asNonNull()
+                for (property in definition.props) {
+                    val (type, default) = getType(property).let {
+                        if (property is ArrayProp) {
+                            (if (property.type is EnumProp)
+                                List::class.parameterizedBy(String::class).asNonNull()
+                            else it.asNonNull()) to CodeBlock.of("%L()", "listOf")
+                        } else (if (property is EnumProp)
+                            String::class.asTypeName().asNullable()
+                        else it.asNullable()) to CodeBlock.of("null")
                     }
-                    val propertySpec = PropertySpec.builder(modelProperty.key, typeName)
+                    val propertySpec = PropertySpec.builder(property.name, type)
                         .addAnnotation(AnnotationSpec.builder(SerializedName::class)
-                            .addMember("\"${modelProperty.key}\"")
+                            .addMember("\"${property.name}\"")
                             .build())
-                        .initializer(modelProperty.key)
-                    if (definition.key.contains("Group") && modelProperty.value.type == ARRAY_SWAGGER_TYPE) {
+                        .initializer(property.name)
+                    if (property.name.contains("Group") || property is ArrayProp) {
                         propertySpec.mutable()
                     }
-                    val parameter = ParameterSpec.builder(modelProperty.key, typeName)
-                    if (typeName.nullable) {
-                        parameter.defaultValue("null")
-                    } else {
-                        parameter.defaultValue(defaultName)
-                    }
+                    val parameter = ParameterSpec.builder(property.name, type)
+                        .defaultValue(default)
                     primaryConstructor.addParameter(parameter.build())
                     modelClassTypeSpec.addProperty(propertySpec.build())
                 }
@@ -319,40 +295,56 @@ class KotlinApiBuilder(
 
     private fun createDatabaseEntities(packageName: String): List<String> {
         val classNameList = ArrayList<String>()
+        val idEntityInterface = ClassName("$packageName.database.entity", "IdEntity")
         val baseEntityInterface = ClassName("$packageName.database.entity", "BaseEntity")
         val deletableEntityInterface = ClassName("$packageName.database.entity", "DeletableEntity")
         val sharedInterface = ClassName("$packageName.database.entity", "SharedData")
 
-        for (definition in modelsWithLinks) {
-            val modelName = definition.key
+        for (definition in modLinks) {
+            val modelName = definition.name
 
             if (skipSyncDataModels(modelName)) continue // skip
 
-            val modelClassTypeSpec: TypeSpec.Builder = TypeSpec.classBuilder(modelName).addModifiers(KModifier.DATA)
+            val modelClassTypeSpec: TypeSpec.Builder = TypeSpec.classBuilder(modelName)
+                .addModifiers(KModifier.DATA)
             classNameList.add(modelName)
 
             val foreignKeys = mutableSetOf<String>()
             var base = baseEntityInterface
 
-            if (definition.value.properties != null) {
+            if (definition is ObjectEntity) {
                 val primaryConstructor = FunSpec.constructorBuilder()
-                for (modelProperty in definition.value.properties) {
-                    if (modelProperty.value.type == ARRAY_SWAGGER_TYPE) {
+                val mutableProps = definition.props.toMutableList()
+                if (!definition.name.contains("Link") && !mutableProps.map { it.name }.contains("id")) {
+                    mutableProps.add(IntegerProp("id"))
+                }
+                if (definition.name == "IncomingPayment") {
+                    mutableProps.add(DateProp("modified"))
+                }
+                for (property in mutableProps) {
+                    if (property is ArrayProp && property.type !is StringProp
+                            && property.type !is DateProp
+                            && property.type !is EnumProp) {
                         continue
                     }
-                    var propertyName = modelProperty.key
+                    var propertyName = property.name
                     var databasePropertyName = propertyName
-                    val typeName = if (modelProperty.value.type == REF_SWAGGER_TYPE) {
-                        propertyName = "id${propertyName.capitalize()}"
-                        Int::class.asTypeName().requiredOrNullable(modelProperty.value.nullable)
-                    } else if (propertyName in enums || ((modelProperty.value is StringProperty
-                            && ((modelProperty.value as StringProperty).enum != null)))) {
-                        val resolvedName = resolveEnumNameMatch(propertyName, modelName)
-                        ClassName("de.weinandit.bestatterprogramma.base.model", resolvedName.capitalize()).asNullable()
-                    } else {
-                        getTypeName(modelProperty)
+                    val nullValue = CodeBlock.of("null")
+                    val (typeName, default) = when(property) {
+                        is ObjectProp -> {
+                            propertyName = "id${propertyName.capitalize()}"
+                            databasePropertyName = propertyName
+                            Int::class.asTypeName().requiredOrNullable(property.nullable) to nullValue
+                        }
+                        is EnumProp -> ClassName("de.weinandit.bestatterprogramma.base.model", property.enumName).asNullable() to nullValue
+                        is ArrayProp -> {
+                            if (property.type is EnumProp) {
+                                Set::class.asTypeName().parameterizedBy(ClassName("de.weinandit.bestatterprogramma.base.model", property.type.enumName)).asNonNull() to CodeBlock.of("%L()", "setOf")
+                            } else getType(property).asNonNull() to CodeBlock.of("%L()", "listOf")
+                        }
+                        else -> getType(property).asNullable() to nullValue
                     }
-                    val propertySpecBuilder = if (modelProperty.key == "id") {
+                    val propertySpecBuilder = if (property.name == "id") {
                         databasePropertyName = propertyName + modelName
                         PropertySpec.builder(propertyName , typeName)
                             .addModifiers(KModifier.OVERRIDE)
@@ -360,7 +352,7 @@ class KotlinApiBuilder(
                                 .addMember("autoGenerate = true")
                                 .build())
                     } else {
-                        if (propertyName.startsWith("id")) {
+                        if (propertyName.startsWith("id") && propertyName[2].isUpperCase()) {
                             foreignKeys.add(propertyName)
                         }
                         PropertySpec.builder(propertyName, typeName)
@@ -382,16 +374,12 @@ class KotlinApiBuilder(
                         .mutable()
                         .build()
                     val parameter = ParameterSpec.builder(propertyName, typeName)
-                    if (modelProperty.value.nullable == false) {
-                        parameter.defaultValue("%L", 0)
+                    if (property.name == "isShared") {
+                        parameter.defaultValue("false")
+                        modelClassTypeSpec.addSuperinterface(sharedInterface)
+                        parameter.addModifiers(KModifier.OVERRIDE)
                     } else {
-                        if (modelProperty.key == "isShared") {
-                            parameter.defaultValue("false")
-                            modelClassTypeSpec.addSuperinterface(sharedInterface)
-                            parameter.addModifiers(KModifier.OVERRIDE)
-                        } else {
-                            parameter.defaultValue("null")
-                        }
+                        parameter.defaultValue(default)
                     }
                     primaryConstructor.addParameter(parameter.build())
                     modelClassTypeSpec.addProperty(propertySpec)
@@ -401,7 +389,11 @@ class KotlinApiBuilder(
                 val entityAnnotationSpec = AnnotationSpec.builder(Entity::class)
                     .addMember("%L = %S", "tableName", modelName.snake())
 
-                if (!linkModels.containsKey(definition.key)) {
+                if (!linkModels.containsKey(definition.name)) {
+                    val fields = mutableProps.map { it.name }
+                    if (!fields.contains("created") && !fields.contains("modified")) {
+                        base = idEntityInterface
+                    }
                     modelClassTypeSpec.addSuperinterface(base)
                 } else {
                     entityAnnotationSpec.addMember("%L = [%S, %S]", "primaryKeys", *foreignKeys.map { it.snake() }.toTypedArray())
@@ -600,12 +592,33 @@ class KotlinApiBuilder(
                 val databaseEntity = ClassName("$packageName.database.entity", entityName)
 
                 val parameters = definition.value.properties.filter {
+                    if (it.value is ArraySchema) {
+                        val schemaa = (it.value as ArraySchema).items
+                        val ref = schemaa.`$ref`?.let { RefUtils.computeDefinitionName(it) }
+                        val isEnum = ref?.let { swaggerModel.components.schemas[it]?.enum } != null
+                        return@filter (schemaa is StringSchema
+                            || schemaa is DateSchema
+                            || schemaa is DateTimeSchema
+                            || schemaa.enum != null
+                            || isEnum)
+                    }
                     it.value.type != ARRAY_SWAGGER_TYPE
                 }
                 val statementFrom = parameters.entries.joinToString(separator = ",\n    ", prefix = "(\n    ", postfix = "\n)") {
                     var param = it.key
-                    if (it.key in enums || (it.value is StringProperty
-                            && ((it.value as StringProperty).enum != null))) {
+                    if (it.value is ArraySchema) {
+                        val ref = (it.value as ArraySchema).items.`$ref`
+                        if (ref != null) {
+                            val refName = RefUtils.computeDefinitionName(ref)
+                            val schema = swaggerModel.components.schemas[refName]
+                            if (schema != null && schema.enum != null) {
+                                enums2[refName] = schema.enum as List<String>
+                                return@joinToString "$param = entity.$param.map { it.toString() }"
+                            }
+                        }
+                    }
+                    val refName = it.value.`$ref`?.let { RefUtils.computeDefinitionName(it) }
+                    if (refName != null) {
                         return@joinToString "$param = entity.$param?.toString()"
                     }
                     if (it.value.type == REF_SWAGGER_TYPE) {
@@ -618,9 +631,20 @@ class KotlinApiBuilder(
                 val mapped = parameters.entries.map {
                     val param = it.key
                     val enumName = resolveEnumNameMatch(param, entityName)
-                    if (it.key in enums || (it.value is StringProperty
-                            && ((it.value as StringProperty).enum != null))) {
-                        classes.add(ClassName("de.weinandit.bestatterprogramma.base.model", enumName.capitalize()))
+                    if (it.value is ArraySchema) {
+                        val ref = (it.value as ArraySchema).items.`$ref`
+                        if (ref != null) {
+                            val refName = RefUtils.computeDefinitionName(ref)
+                            val enumName = enums2[refName]
+                            if (enumName != null) {
+                                classes.add(ClassName("de.weinandit.bestatterprogramma.base.model", refName))
+                                return@map "$param = entity.$param.mapNotNull { %T.from(it) }.toSet()"
+                            }
+                        }
+                    }
+                    val refName = it.value.`$ref`?.let { RefUtils.computeDefinitionName(it) }
+                    if (refName != null) {
+                        classes.add(ClassName("de.weinandit.bestatterprogramma.base.model", refName))
                         return@map "$param = entity.$param?.let { %T.from(it) }"
                     }
                     if (it.value.type == REF_SWAGGER_TYPE) {
@@ -1008,15 +1032,33 @@ class KotlinApiBuilder(
         return operation.value.parameters.filterNot { it.description.isNullOrBlank() }.map { "@param ${it.name} ${it.description}" }
     }
 
-    private fun getTypeName(modelProperty: MutableMap.MutableEntry<String, Schema<Any>>): TypeName {
+    val enums2: MutableMap<String, List<String>> = mutableMapOf()
+
+    //private fun
+
+    private fun getTypeName(modelProperty: MutableMap.MutableEntry<String, Schema<Any>>, isDto: Boolean = false): TypeName {
         val property = modelProperty.value
         return when {
-            property.`$ref` != null ->
-                TypeVariableName.invoke(RefUtils.computeDefinitionName(property.`$ref`)).requiredOrNullable(property.nullable)
+            property.`$ref` != null -> {
+                val refName = RefUtils.computeDefinitionName(property.`$ref`)
+                val definition = swaggerModel.components.schemas[refName]
+                if (definition != null) {
+                    when (definition.type) {
+                        "string" -> {
+                            if (definition.enum != null) {
+                                @Suppress("UNCHECKED_CAST")
+                                enums2[refName] = definition.enum as List<String>
+                            }
+                            return TypeVariableName(String::class.simpleName!!).requiredOrNullable(property.nullable)
+                        }
+                    }
+                }
+                TypeVariableName.invoke(refName).requiredOrNullable(property.nullable)
+            }
 
             property.type == ARRAY_SWAGGER_TYPE -> {
                 val arrayProperty = property as ArraySchema
-                getTypedArray(arrayProperty.items).requiredOrNullable(arrayProperty.nullable)
+                getTypedArray(arrayProperty.items, isDto).requiredOrNullable(arrayProperty.nullable)
             }
             else -> getKotlinClassTypeName(property).requiredOrNullable(property.nullable)
         }
@@ -1074,14 +1116,14 @@ class KotlinApiBuilder(
         }
     }
 
-    private fun getTypedArray(items: Schema<*>): TypeName {
+    private fun getTypedArray(items: Schema<*>, isDto: Boolean = false): TypeName {
         val typeProperty = when (items) {
             is LongProperty -> TypeVariableName.invoke(Long::class.simpleName!!)
             is IntegerSchema -> TypeVariableName.invoke(Int::class.simpleName!!)
             is FloatProperty -> TypeVariableName.invoke(Float::class.simpleName!!)
             is DoubleProperty -> TypeVariableName.invoke(Float::class.simpleName!!)
-            is RefProperty -> TypeVariableName.invoke(items.simpleRef)
-            else -> getKotlinClassTypeName(items)
+            is StringSchema -> TypeVariableName.invoke(String::class.simpleName!!)
+            else -> getKotlinClassTypeName(items, isDto)
         }
         return List::class.asClassName().parameterizedBy(typeProperty)
     }
@@ -1133,11 +1175,23 @@ class KotlinApiBuilder(
         return className
     }
 
-    private fun getKotlinClassTypeName(schema: Schema<*>): TypeName {
+    private fun getKotlinClassTypeName(schema: Schema<*>, isDto: Boolean = false): TypeName {
         val type = schema.type
         val format = schema.format
         if (schema.`$ref` != null) {
-            return TypeVariableName.invoke(RefUtils.computeDefinitionName(schema.`$ref`))
+            val name = RefUtils.computeDefinitionName(schema.`$ref`)
+            if (swaggerModel.components.schemas[name]?.type == "string") {
+                return TypeVariableName(String::class.simpleName!!)
+            }
+            if (isDto) {
+                val newName = if (!name.endsWith("Dto")) {
+                    name + "Dto"
+                } else if (name.endsWith("SyncDto")) {
+                    name.replace("Sync", "")
+                } else name
+                return TypeVariableName.invoke(newName)
+            }
+            return TypeVariableName.invoke(name)
         }
         return when (type) {
             ARRAY_SWAGGER_TYPE -> TypeVariableName.invoke(List::class.simpleName!!)
@@ -1186,5 +1240,120 @@ class KotlinApiBuilder(
             generated += StorageUtils.generateString(proteinApiConfiguration.packageName, typeSpec)
         }
         return generated
+    }
+
+    open class ModelEntity(val name: String)
+    class ObjectEntity(name: String, val props: List<Prop>) : ModelEntity(name) {
+        override fun toString(): String {
+            return "Object. Name: $name, Properties: [ ${props.joinToString { it.name }} ]"
+        }
+    }
+    class EnumEntity(name: String, val values: List<String>) : ModelEntity(name)
+
+    open class Prop(val name: String) {
+        val nullable: Boolean = true
+
+        override fun toString(): String {
+            return "Property. Name: $name"
+        }
+    }
+    class IntegerProp(name: String) : Prop(name)
+    class StringProp(name: String) : Prop(name)
+    class DateProp(name: String) : Prop(name)
+    class BoolProp(name: String) : Prop(name)
+    class FloatProp(name: String) : Prop(name)
+    class EnumProp(name: String, val enumName: String) : Prop(name)
+    class ArrayProp(name: String, val type: Prop) : Prop(name)
+    class ObjectProp(name: String, val objectName: String) : Prop(name)
+
+    fun convert(objects: Map<String, Schema<Any>>): List<ModelEntity> {
+        val models = mutableListOf<ModelEntity>()
+        objects.forEach { def ->
+            val name = def.key
+            val schema = def.value
+            if (schema.type == "object") {
+                val model = ObjectEntity(
+                    name,
+                    schema.properties.map { p ->
+                        val propName = p.key
+                        val propScheme = p.value
+                        getProp(propName, propScheme)
+                    }
+                )
+                models.add(model)
+            }
+        }
+        return models
+    }
+
+    fun getProp(name: String, schema: Schema<*>): Prop {
+        return when(schema.type) {
+            "string" -> {
+                if (schema.format == "date-time") {
+                    DateProp(name)
+                } else StringProp(name)
+            }
+            "integer" -> IntegerProp(name)
+            "boolean" -> BoolProp(name)
+            "number" -> FloatProp(name)
+            "array" -> ArrayProp(name, getProp(name, (schema as ArraySchema).items))
+            else -> {
+                val ref = schema.`$ref`
+                if (ref != null) {
+                    parseReference(name, ref)
+                } else Prop(name)
+            }
+        }
+    }
+
+    fun parseReference(name: String, ref: String): Prop {
+        val objects = swaggerModel.components.schemas
+        val refName = RefUtils.computeDefinitionName(ref)
+        return if (objects[refName]?.enum != null) {
+            EnumProp(name, refName)
+        } else ObjectProp(name, refName)
+    }
+
+    fun getType(prop: Prop): TypeName {
+        val typeName: TypeName = when(prop) {
+            is StringProp -> String::class.asTypeName()
+            is IntegerProp -> Int::class.asTypeName()
+            is DateProp -> Date::class.asTypeName()
+            is BoolProp -> Boolean::class.asTypeName()
+            is FloatProp -> Float::class.asTypeName()
+            is ArrayProp -> List::class.asTypeName().parameterizedBy(getType(prop.type))
+            is EnumProp -> ClassName("", prop.enumName)
+            is ObjectProp -> ClassName("", prop.objectName)
+            else -> Object::class.asTypeName()
+        }
+        return typeName
+    }
+
+    private fun filterModels() {
+        if (swaggerModel.components.schemas != null && swaggerModel.components.schemas.isNotEmpty()) {
+            val types = arrayListOf<String>()
+            types.add("SyncData")
+            var i = 0
+            while (i < types.size) {
+                val name = types[i]
+                val definition = findDefinition(name)
+                val key = name.replace(Regex("SyncDto\\b|Dto\\b"), "")
+                models[key] = definition
+                if (key.contains("Group") && key != "PriceGroupTypes") {
+                    val link = ObjectSchema()
+                    val prop = IntegerSchema()
+                    prop.nullable = false
+                    val withoutGroup = key.replace("Group", "")
+                    link.properties = mutableMapOf()
+                    link.properties["id$withoutGroup"] = prop
+                    link.properties["id$key"] = prop
+                    linkModels[key + "Link"] = link
+                }
+                findRefs(definition, types)
+                i++
+            }
+        }
+        modelsWithLinks.putAll(models)
+        modelsWithLinks.putAll(linkModels)
     }
 }
