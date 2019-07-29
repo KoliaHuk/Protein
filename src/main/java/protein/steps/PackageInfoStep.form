@@ -3,7 +3,7 @@
   <grid id="27dc6" binding="rootPanel" layout-manager="GridLayoutManager" row-count="3" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="20" y="20" width="1095" height="644"/>
+      <xy x="20" y="20" width="1130" height="644"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -179,13 +179,13 @@
               <text value="Mappers"/>
             </properties>
           </component>
-          <component id="2d3e3" class="javax.swing.JCheckBox" binding="domainEnitiesCheckBox" default-binding="true">
+          <component id="2d3e3" class="javax.swing.JCheckBox" binding="enumsCheckBox">
             <constraints>
               <grid row="2" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <enabled value="true"/>
-              <text value="Domain Enities"/>
+              <text value="Enums"/>
             </properties>
           </component>
           <component id="9c88b" class="javax.swing.JCheckBox" binding="syncDTOCheckBox" default-binding="true">
@@ -196,12 +196,12 @@
               <text value="Sync DTO"/>
             </properties>
           </component>
-          <component id="86728" class="javax.swing.JCheckBox" binding="domainMappersCheckBox" default-binding="true">
+          <component id="86728" class="javax.swing.JCheckBox" binding="triggersCheckBox" default-binding="true">
             <constraints>
               <grid row="3" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="DomainMappers"/>
+              <text value="Triggers"/>
             </properties>
           </component>
           <component id="60d4f" class="javax.swing.JCheckBox" binding="mapHelperCheckBox" default-binding="true">

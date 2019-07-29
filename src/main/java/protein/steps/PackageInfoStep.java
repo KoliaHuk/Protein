@@ -7,7 +7,6 @@ import protein.common.Settings;
 import protein.common.SettingsManager;
 import protein.kotlinbuilders.KotlinApiBuilder;
 import protein.kotlinbuilders.ProteinApiConfiguration;
-import protein.tracking.BugsnagErrorTracking;
 import protein.tracking.DialogErrorTracking;
 import protein.tracking.ErrorTracking;
 
@@ -35,8 +34,8 @@ public class PackageInfoStep extends WizardStep<AddComponentWizardModel> {
     private JCheckBox PUTMapHelperCheckBox;
     private JCheckBox mapHelperCheckBox;
     private JCheckBox databaseCheckBox;
-    private JCheckBox domainEnitiesCheckBox;
-    private JCheckBox domainMappersCheckBox;
+    private JCheckBox enumsCheckBox;
+    private JCheckBox triggersCheckBox;
     private JCheckBox baseDaoCheckBox;
     private ErrorTracking errorTracking = new DialogErrorTracking();// new BugsnagErrorTracking();
 
@@ -156,8 +155,8 @@ public class PackageInfoStep extends WizardStep<AddComponentWizardModel> {
             mappersCheckBox.isSelected(),
             mapHelperCheckBox.isSelected(),
             PUTMapHelperCheckBox.isSelected(),
-            domainEnitiesCheckBox.isSelected(),
-            domainMappersCheckBox.isSelected()
+            enumsCheckBox.isSelected(),
+            triggersCheckBox.isSelected()
         );
     }
 }

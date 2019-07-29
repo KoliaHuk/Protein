@@ -51,9 +51,11 @@ import protein.extensions.snake
 import protein.tracking.ErrorTracking
 import java.io.FileNotFoundException
 import java.lang.IllegalStateException
+import java.lang.StringBuilder
 import java.net.UnknownHostException
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.reflect.KClass
 
 class KotlinApiBuilder(
     private val proteinApiConfiguration: ProteinApiConfiguration,
@@ -103,6 +105,7 @@ class KotlinApiBuilder(
     private val domainMappersSpec: ArrayList<TypeSpec> = ArrayList()
     private val mappersTypeSpec: ArrayList<TypeSpec> = ArrayList()
     private val enumListTypeSpec: ArrayList<TypeSpec> = ArrayList()
+    private lateinit var triggersHelperTypeSpec: TypeSpec
 
     fun build() {
         filterModels()
@@ -110,15 +113,15 @@ class KotlinApiBuilder(
         modLinks = convert(modelsWithLinks)
         val p = proteinApiConfiguration.packageName
 
-        createSyncEntityModels()
+        createSyncEntityModels(p)
         createDatabaseEntities(p)
         createDao(p)
         createDatabase(p)
         createMappers(p)
+        createEnums("de.weinandit.bestatterprogramma")
         createMapHelper(p)
         createPutMapHelper(p)
-        createDomainEntities(p)
-        createDomainMappers(p)
+        createUndoTriggers(p)
     }
 
     fun getGeneratedTypeSpec(): TypeSpec {
@@ -134,8 +137,8 @@ class KotlinApiBuilder(
         isMappers: Boolean,
         isHelper: Boolean,
         isPutHelper: Boolean,
-        isDomainEntities: Boolean,
-        isDomainMappers: Boolean
+        isEnums: Boolean,
+        isTriggers: Boolean
     ) {
         /*StorageUtils.generateFiles(
           proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName, apiInterfaceTypeSpec)*/
@@ -180,7 +183,18 @@ class KotlinApiBuilder(
         if (isPutHelper) {
             StorageUtils.generateFiles(
                 proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName + ".sync.mapper.helper", mapPutHelperTypeSpec)
-        }/*
+        }
+        if (isEnums) {
+            for (typeSpec in enumListTypeSpec) {
+                StorageUtils.generateFiles(
+                    proteinApiConfiguration.moduleName, "de.weinandit.bestatterprogramma.base.model", typeSpec)
+            }
+        }
+        if (isTriggers) {
+            StorageUtils.generateFiles(
+                proteinApiConfiguration.moduleName, proteinApiConfiguration.packageName + ".database.trigger", triggersHelperTypeSpec)
+        }
+        /*
         if (isDomainEntities) {
             for (typeSpec in domainEntitiesSpec) {
                 StorageUtils.generateFiles(
@@ -255,7 +269,7 @@ class KotlinApiBuilder(
 
     private val syncDtoPostfix = "Dto"
 
-    private fun createSyncEntityModels() {
+    private fun createSyncEntityModels(packageName: String) {
         for (definition in mods) {
             val modelClassTypeSpec: TypeSpec.Builder
                 = TypeSpec.classBuilder(definition.name + syncDtoPostfix)
@@ -264,10 +278,20 @@ class KotlinApiBuilder(
                 val primaryConstructor = FunSpec.constructorBuilder()
                 for (property in definition.props) {
                     val (type, default) = getType(property).let {
+                        if (property is ObjectProp) {
+                            ClassName("$packageName.sync.entity", property.name + syncDtoPostfix).asNullable() to CodeBlock.of("null")
+                        }
                         if (property is ArrayProp) {
-                            (if (property.type is EnumProp)
-                                List::class.parameterizedBy(String::class).asNonNull()
-                            else it.asNonNull()) to CodeBlock.of("%L()", "listOf")
+                            (when {
+                                property.type is ObjectProp -> List::class.asTypeName()
+                                    .parameterizedBy(ClassName("$packageName.sync.entity",
+                                        property.type.objectName.let {
+                                            (if (!it.endsWith("Dto")) it + syncDtoPostfix else it).replace("Sync", "")
+                                        }))
+                                    .asNonNull()
+                                property.type is EnumProp -> List::class.parameterizedBy(String::class).asNonNull()
+                                else -> it.asNonNull()
+                            }) to CodeBlock.of("%L()", "listOf")
                         } else (if (property is EnumProp)
                             String::class.asTypeName().asNullable()
                         else it.asNullable()) to CodeBlock.of("null")
@@ -277,7 +301,7 @@ class KotlinApiBuilder(
                             .addMember("\"${property.name}\"")
                             .build())
                         .initializer(property.name)
-                    if (property.name.contains("Group") || property is ArrayProp) {
+                    if (property is ArrayProp) {
                         propertySpec.mutable()
                     }
                     val parameter = ParameterSpec.builder(property.name, type)
@@ -313,6 +337,12 @@ class KotlinApiBuilder(
             var base = baseEntityInterface
 
             if (definition is ObjectEntity) {
+                if (when(definition.name) {
+                    "Phone", "Fax", "Email", "Www" -> true
+                        else -> false
+                }) {
+                    continue
+                }
                 val primaryConstructor = FunSpec.constructorBuilder()
                 val mutableProps = definition.props.toMutableList()
                 if (!definition.name.contains("Link") && !mutableProps.map { it.name }.contains("id")) {
@@ -320,6 +350,9 @@ class KotlinApiBuilder(
                 }
                 if (definition.name == "IncomingPayment") {
                     mutableProps.add(DateProp("modified"))
+                }
+                if (definition.name == "PersonGroup") {
+                    mutableProps.add(StringProp("type"))
                 }
                 for (property in mutableProps) {
                     if (property is ArrayProp && property.type !is StringProp
@@ -342,7 +375,11 @@ class KotlinApiBuilder(
                                 Set::class.asTypeName().parameterizedBy(ClassName("de.weinandit.bestatterprogramma.base.model", property.type.enumName)).asNonNull() to CodeBlock.of("%L()", "setOf")
                             } else getType(property).asNonNull() to CodeBlock.of("%L()", "listOf")
                         }
-                        else -> getType(property).asNullable() to nullValue
+                        else -> {
+                            if (linkModels.containsKey(definition.name)) {
+                                getType(property).asNonNull() to CodeBlock.of("%L", 0)
+                            } else getType(property).asNullable() to nullValue
+                        }
                     }
                     val propertySpecBuilder = if (property.name == "id") {
                         databasePropertyName = propertyName + modelName
@@ -428,12 +465,19 @@ class KotlinApiBuilder(
         return classNameList
     }
 
+    enum class DaoClass {
+        ID,
+        MUTABLE
+    }
+
     private fun createDao(packageName: String) {
         val liveData = ClassName("androidx.lifecycle", "LiveData")
-        for (definition in modelsWithLinks) {
+        for (definition in modLinks) {
             val baseDao = ClassName("de.weinandit.bestatterprogramma.modules.database.dao.base", "BaseDao")
+            val baseIdEntityDao = ClassName("de.weinandit.bestatterprogramma.modules.database.dao.base", "BaseIdEntityDao")
             val baseEntityDao = ClassName("de.weinandit.bestatterprogramma.modules.database.dao.base", "BaseEntityDao")
-            val entityName = definition.key
+            val baseLinkDao = ClassName("de.weinandit.bestatterprogramma.modules.database.dao.base", "BaseLinkDao")
+            val entityName = definition.name
 
             if (skipSyncDataModels(entityName)) continue // skip
 
@@ -443,73 +487,88 @@ class KotlinApiBuilder(
                 .addAnnotation(AnnotationSpec.builder(Dao::class)
                     .build())
 
-            if (models.containsKey(definition.key)) {
+            if (models.containsKey(definition.name)) {
+                if (definition is ObjectEntity) {
+                    val type = if (definition.props.find { it.name == "modified" } != null) DaoClass.MUTABLE
+                    else DaoClass.ID
 
-                modelClassTypeSpec.addFunction(FunSpec.builder("findById")
-                    .addModifiers(KModifier.ABSTRACT, KModifier.OVERRIDE)
-                    .returns(liveData.parameterizedBy(parameterType.asNullable()))
-                    .addAnnotation(AnnotationSpec.builder(Query::class)
-                        .addMember("%S", "SELECT * FROM `$snakeCaseName` WHERE id_$snakeCaseName = :id")
+                    modelClassTypeSpec.addFunction(FunSpec.builder("findById")
+                        .addModifiers(KModifier.ABSTRACT, KModifier.OVERRIDE)
+                        .returns(liveData.parameterizedBy(parameterType.asNullable()))
+                        .addAnnotation(AnnotationSpec.builder(Query::class)
+                            .addMember("%S", "SELECT * FROM `$snakeCaseName` WHERE id_$snakeCaseName = :id")
+                            .build())
+                        .addParameter("id", Int::class)
                         .build())
-                    .addParameter("id", Int::class)
-                    .build())
 
-                modelClassTypeSpec.addFunction(FunSpec.builder("findByIdSync")
-                    .addModifiers(KModifier.ABSTRACT, KModifier.OVERRIDE)
-                    .returns(parameterType.asNullable())
-                    .addAnnotation(AnnotationSpec.builder(Query::class)
-                        .addMember("%S", "SELECT * FROM `$snakeCaseName` WHERE id_$snakeCaseName = :id")
+                    modelClassTypeSpec.addFunction(FunSpec.builder("findByIdSync")
+                        .addModifiers(KModifier.ABSTRACT, KModifier.OVERRIDE)
+                        .returns(parameterType.asNullable())
+                        .addAnnotation(AnnotationSpec.builder(Query::class)
+                            .addMember("%S", "SELECT * FROM `$snakeCaseName` WHERE id_$snakeCaseName = :id")
+                            .build())
+                        .addParameter("id", Int::class)
                         .build())
-                    .addParameter("id", Int::class)
-                    .build())
 
-                modelClassTypeSpec.addFunction(FunSpec.builder("findByIdIn")
-                    .addModifiers(KModifier.ABSTRACT, KModifier.OVERRIDE)
-                    .returns(liveData.parameterizedBy(List::class.asTypeName().parameterizedBy(parameterType)))
-                    .addAnnotation(AnnotationSpec.builder(Query::class)
-                        .addMember("%S", "SELECT * FROM `$snakeCaseName` WHERE id_$snakeCaseName IN (:id)")
+                    modelClassTypeSpec.addFunction(FunSpec.builder("findByIdIn")
+                        .addModifiers(KModifier.ABSTRACT, KModifier.OVERRIDE)
+                        .returns(liveData.parameterizedBy(List::class.asTypeName().parameterizedBy(parameterType)))
+                        .addAnnotation(AnnotationSpec.builder(Query::class)
+                            .addMember("%S", "SELECT * FROM `$snakeCaseName` WHERE id_$snakeCaseName IN (:id)")
+                            .build())
+                        .addParameter("id", List::class.parameterizedBy(Int::class))
                         .build())
-                    .addParameter("id", List::class.asTypeName().parameterizedBy(Int::class.asTypeName()))
-                    .build())
 
-                modelClassTypeSpec.addFunction(FunSpec.builder("findAll")
-                    .addModifiers(KModifier.ABSTRACT, KModifier.OVERRIDE)
-                    .returns(liveData.parameterizedBy(List::class.asTypeName().parameterizedBy(parameterType)))
-                    .addAnnotation(AnnotationSpec.builder(Query::class)
-                        .addMember("%S", "SELECT * FROM `$snakeCaseName`")
-                        .build())
-                    .build())
-
-                modelClassTypeSpec.addFunction(FunSpec.builder("findAllSync")
-                    .addModifiers(KModifier.ABSTRACT, KModifier.OVERRIDE)
-                    .returns(List::class.asTypeName().parameterizedBy(parameterType))
-                    .addAnnotation(AnnotationSpec.builder(Query::class)
-                        .addMember("%S", "SELECT * FROM `$snakeCaseName`")
-                        .build())
-                    .build())
-
-                if (definition.value.properties?.containsKey("modified") == true) {
-                    modelClassTypeSpec.addSuperinterface(baseEntityDao.parameterizedBy(parameterType))
-
-                    modelClassTypeSpec.addFunction(FunSpec.builder("findSinceBefore")
+                    modelClassTypeSpec.addFunction(FunSpec.builder("findByIdInSync")
                         .addModifiers(KModifier.ABSTRACT, KModifier.OVERRIDE)
                         .returns(List::class.asTypeName().parameterizedBy(parameterType))
                         .addAnnotation(AnnotationSpec.builder(Query::class)
-                            .addMember("%S", "SELECT * FROM `$snakeCaseName` WHERE modified BETWEEN :since AND :before")
+                            .addMember("%S", "SELECT * FROM `$snakeCaseName` WHERE id_$snakeCaseName IN (:id)")
                             .build())
-                        .addParameter("since", Date::class)
-                        .addParameter("before", Date::class)
+                        .addParameter("id", List::class.parameterizedBy(Int::class))
                         .build())
-                } else {
-                    modelClassTypeSpec.addSuperinterface(baseDao.parameterizedBy(parameterType))
+
+                    modelClassTypeSpec.addFunction(FunSpec.builder("findAll")
+                        .addModifiers(KModifier.ABSTRACT, KModifier.OVERRIDE)
+                        .returns(liveData.parameterizedBy(List::class.asTypeName().parameterizedBy(parameterType)))
+                        .addAnnotation(AnnotationSpec.builder(Query::class)
+                            .addMember("%S", "SELECT * FROM `$snakeCaseName`")
+                            .build())
+                        .build())
+
+                    modelClassTypeSpec.addFunction(FunSpec.builder("findAllSync")
+                        .addModifiers(KModifier.ABSTRACT, KModifier.OVERRIDE)
+                        .returns(List::class.asTypeName().parameterizedBy(parameterType))
+                        .addAnnotation(AnnotationSpec.builder(Query::class)
+                            .addMember("%S", "SELECT * FROM `$snakeCaseName`")
+                            .build())
+                        .build())
+
+                    if (type == DaoClass.MUTABLE) {
+                        modelClassTypeSpec.addSuperinterface(baseEntityDao.parameterizedBy(parameterType))
+
+                        modelClassTypeSpec.addFunction(FunSpec.builder("findSinceBefore")
+                            .addModifiers(KModifier.ABSTRACT, KModifier.OVERRIDE)
+                            .returns(List::class.asTypeName().parameterizedBy(parameterType))
+                            .addAnnotation(AnnotationSpec.builder(Query::class)
+                                .addMember("%S", "SELECT * FROM `$snakeCaseName` WHERE modified BETWEEN :since AND :before")
+                                .build())
+                            .addParameter("since", Date::class)
+                            .addParameter("before", Date::class)
+                            .build())
+                    } else {
+                        modelClassTypeSpec.addSuperinterface(baseIdEntityDao.parameterizedBy(parameterType))
+                    }
                 }
 
             } else {
                 modelClassTypeSpec.addSuperinterface(baseDao.parameterizedBy(parameterType))
+                modelClassTypeSpec.addSuperinterface(baseLinkDao.parameterizedBy(parameterType))
 
                 val groupParam = "id_${snakeCaseName.substring(0, snakeCaseName.length - 5)}"
                 modelClassTypeSpec.addFunction(FunSpec.builder("findByGroupId")
                     .addModifiers(KModifier.ABSTRACT)
+                    .addModifiers(KModifier.OVERRIDE)
                     .returns(List::class.asTypeName().parameterizedBy(parameterType))
                     .addAnnotation(AnnotationSpec.builder(Query::class)
                         .addMember("%S", "SELECT * FROM `$snakeCaseName` WHERE $groupParam = :id")
@@ -517,15 +576,25 @@ class KotlinApiBuilder(
                     .addParameter("id", Int::class)
                     .build())
 
-                val param = groupParam.substring(0, groupParam.length - 6)
-                modelClassTypeSpec.addFunction(FunSpec.builder("findUnnecessary")
+                modelClassTypeSpec.addFunction(FunSpec.builder("findByGroupIdLive")
                     .addModifiers(KModifier.ABSTRACT)
-                    .returns(List::class.asTypeName().parameterizedBy(parameterType))
+                    //.addModifiers(KModifier.OVERRIDE)
+                    .returns(liveData.parameterizedBy(List::class.asTypeName().parameterizedBy(parameterType)))
                     .addAnnotation(AnnotationSpec.builder(Query::class)
-                        .addMember("%S", "SELECT * FROM `$snakeCaseName` WHERE $groupParam = :id AND $param NOT IN (:list)")
+                        .addMember("%S", "SELECT * FROM `$snakeCaseName` WHERE $groupParam = :id")
                         .build())
                     .addParameter("id", Int::class)
-                    .addParameter("list", List::class.asTypeName().parameterizedBy(Int::class.asTypeName()))
+                    .build())
+
+                val param = groupParam.substring(0, groupParam.length - 6)
+                modelClassTypeSpec.addFunction(FunSpec.builder("deleteOldLinks")
+                    .addModifiers(KModifier.ABSTRACT)
+                    //.addModifiers(KModifier.OVERRIDE)
+                    .addAnnotation(AnnotationSpec.builder(Query::class)
+                        .addMember("%S", "DELETE FROM `$snakeCaseName` WHERE $groupParam = :id AND $param NOT IN (:list)")
+                        .build())
+                    .addParameter("id", Int::class)
+                    .addParameter("list", List::class.parameterizedBy(Int::class))
                     .build())
             }
             val baseType = modelClassTypeSpec.build()
@@ -579,79 +648,67 @@ class KotlinApiBuilder(
     private fun createMappers(packageName: String) {
         val classNameList = ArrayList<String>()
 
-        for (definition in models) {
-            val entityName = definition.key
+        for (definition in mods) {
+            val entityName = definition.name
 
             if (skipSyncDataModels(entityName)) continue // skip
 
             val modelClassTypeSpec: TypeSpec.Builder = TypeSpec.classBuilder(entityName + "Mapper")
             classNameList.add(entityName)
 
-            if (definition.value.properties != null) {
+            if (definition is ObjectEntity) {
                 val syncEntity = ClassName("$packageName.sync.entity", entityName + syncDtoPostfix)
                 val databaseEntity = ClassName("$packageName.database.entity", entityName)
 
-                val parameters = definition.value.properties.filter {
-                    if (it.value is ArraySchema) {
-                        val schemaa = (it.value as ArraySchema).items
-                        val ref = schemaa.`$ref`?.let { RefUtils.computeDefinitionName(it) }
-                        val isEnum = ref?.let { swaggerModel.components.schemas[it]?.enum } != null
-                        return@filter (schemaa is StringSchema
-                            || schemaa is DateSchema
-                            || schemaa is DateTimeSchema
-                            || schemaa.enum != null
-                            || isEnum)
+                val parameters = definition.props.filter {
+                    if (it is ArrayProp) {
+                        val type = it.type
+                        return@filter (type is StringProp
+                            || type is DateProp
+                            || type is EnumProp)
                     }
-                    it.value.type != ARRAY_SWAGGER_TYPE
+                    return@filter it !is ArrayProp || it !is ObjectProp
                 }
-                val statementFrom = parameters.entries.joinToString(separator = ",\n    ", prefix = "(\n    ", postfix = "\n)") {
-                    var param = it.key
-                    if (it.value is ArraySchema) {
-                        val ref = (it.value as ArraySchema).items.`$ref`
-                        if (ref != null) {
-                            val refName = RefUtils.computeDefinitionName(ref)
-                            val schema = swaggerModel.components.schemas[refName]
-                            if (schema != null && schema.enum != null) {
-                                enums2[refName] = schema.enum as List<String>
-                                return@joinToString "$param = entity.$param.map { it.toString() }"
-                            }
+                val statementFrom = parameters.joinToString(separator = ",\n    ", prefix = "(\n    ", postfix = "\n)") {
+                    var param = it.name
+                    if (it is ArrayProp) {
+                        if (it.type is EnumProp) {
+                            val name = it.type.enumName
+                            val enum = swaggerModel.components.schemas[name]?.enum?.apply { remove("none") }?: listOf()
+                            enums2[name] = enum as List<String>
+                            return@joinToString "$param = entity.$param.map { it.toString() }"
                         }
                     }
-                    val refName = it.value.`$ref`?.let { RefUtils.computeDefinitionName(it) }
-                    if (refName != null) {
+                    if (it is EnumProp) {
+                        val name = it.enumName
+                        val enum = swaggerModel.components.schemas[name]?.enum?.apply { remove("none") }?: listOf()
+                        enums2[name] = enum as List<String>
                         return@joinToString "$param = entity.$param?.toString()"
                     }
-                    if (it.value.type == REF_SWAGGER_TYPE) {
+                    if (it is ObjectProp) {
                         param = "id${param.capitalize()}"
-                        return@joinToString "$param = entity.${it.key}?.id"
+                        return@joinToString "//$param = entity.${it.name}?.id"
                     }
-                    return@joinToString "$param = entity.${it.key}"
+                    return@joinToString "$param = entity.${it.name}"
                 }
                 val classes = mutableListOf<TypeName>()
-                val mapped = parameters.entries.map {
-                    val param = it.key
-                    val enumName = resolveEnumNameMatch(param, entityName)
-                    if (it.value is ArraySchema) {
-                        val ref = (it.value as ArraySchema).items.`$ref`
-                        if (ref != null) {
-                            val refName = RefUtils.computeDefinitionName(ref)
-                            val enumName = enums2[refName]
-                            if (enumName != null) {
-                                classes.add(ClassName("de.weinandit.bestatterprogramma.base.model", refName))
-                                return@map "$param = entity.$param.mapNotNull { %T.from(it) }.toSet()"
-                            }
+                val mapped = parameters.map {
+                    val param = it.name
+                    if (it is ArrayProp) {
+                        if (it.type is EnumProp) {
+                            classes.add(ClassName("de.weinandit.bestatterprogramma.base.model", it.type.enumName))
+                            return@map "$param = entity.$param.mapNotNull { %T.from(it) }.toSet()"
                         }
                     }
-                    val refName = it.value.`$ref`?.let { RefUtils.computeDefinitionName(it) }
-                    if (refName != null) {
-                        classes.add(ClassName("de.weinandit.bestatterprogramma.base.model", refName))
+                    if (it is EnumProp) {
+                        classes.add(ClassName("de.weinandit.bestatterprogramma.base.model", it.enumName))
                         return@map "$param = entity.$param?.let { %T.from(it) }"
                     }
-                    if (it.value.type == REF_SWAGGER_TYPE) {
+                    if (it is ObjectProp) {
                         return@map null
                     }
-                    return@map "${it.key} = entity.$param"
-                }.filterNotNull()
+                    return@map "${it.name} = entity.$param"
+                }.filterNotNull().let { if (definition.name == "PersonGroup") it.toMutableList().apply { add("type = type") } else it  }
 
                 val statement = mapped.joinToString(separator = ",\n    ", prefix = "(\n    ", postfix = "\n)")
                 val block = CodeBlock.of(statement, *classes.toTypedArray())
@@ -659,19 +716,120 @@ class KotlinApiBuilder(
                 val funcFromSyncToDatabase = FunSpec.builder("map")
                     .addParameter("entity", syncEntity)
                     .addStatement("return %T%L", databaseEntity, block)
-                    .build()
+                if (definition.name == "PersonGroup") {
+                    funcFromSyncToDatabase.addParameter("type", String::class)
+                }
+
                 val funcFromDatabaseToSync = FunSpec.builder("map")
                     .addParameter("entity", databaseEntity)
                     .addStatement("return %T%L", syncEntity, statementFrom)
                     .build()
 
-                modelClassTypeSpec.addFunction(funcFromSyncToDatabase)
+                modelClassTypeSpec.addFunction(funcFromSyncToDatabase.build())
                 modelClassTypeSpec.addFunction(funcFromDatabaseToSync)
                 mappersTypeSpec.add(modelClassTypeSpec.build())
             }
         }
         mappersTypeSpec
     }
+
+    private fun createEnums(packageName: String) {
+        val r = ClassName(packageName, "R")
+        enums2.forEach { name, list ->
+            val spec = TypeSpec.enumBuilder(name)
+            list.forEachIndexed { index, n ->
+                val enumName = n.replace(" ", "_")
+                val stringName = when(enumName) {
+                    "public", "private", "void", "new" -> enumName + "_text"
+                    else -> enumName
+                }
+                val s = TypeSpec.anonymousClassBuilder()
+                    .addSuperclassConstructorParameter("%S", n)
+                    .addSuperclassConstructorParameter("%T.string.$stringName", r)
+                val extra = extraFields[name]
+                extra?.let { e ->
+                    val value = e.second[index]
+                    if (value is RRequire) {
+                        s.addSuperclassConstructorParameter(value.text, r)
+                    } else s.addSuperclassConstructorParameter("%S", value.text)
+                }
+                spec.addEnumConstant(enumName.toUpperCase(), s.build())
+            }
+            val primaryConstructor = FunSpec.constructorBuilder()
+            primaryConstructor.addParameter(ParameterSpec.builder("value", String::class).build())
+            primaryConstructor.addParameter(ParameterSpec.builder("resId", Int::class).build())
+            val extra = extraFields[name]
+            extra?.let { e ->
+                primaryConstructor.addParameter(ParameterSpec.builder(e.first, e.third).build())
+            }
+            spec.addProperty(PropertySpec.builder("value", String::class)
+                .initializer("value")
+                .build())
+            spec.addProperty(PropertySpec.builder("resId", Int::class)
+                .initializer("resId")
+                .build())
+            extra?.let { e ->
+                spec.addProperty(PropertySpec.builder(e.first, e.third)
+                    .initializer(e.first)
+                    .build())
+            }
+            spec.addFunction(FunSpec.builder("toString")
+                .addModifiers(KModifier.OVERRIDE)
+                .returns(String::class)
+                .addStatement("return value")
+                .build())
+            val companion = TypeSpec.companionObjectBuilder()
+                .addFunction(FunSpec.builder("from")
+                    .addParameter("s", String::class.asTypeName().asNullable())
+                    .returns(ClassName("", name).asNullable())
+                    .addStatement("return values().find { it.value == s }")
+                    .build())
+                .build()
+            spec.primaryConstructor(primaryConstructor.build())
+            spec.addType(companion)
+            enumListTypeSpec.add(spec.build())
+        }
+        enumListTypeSpec
+    }
+
+    open class Specs(val text: String)
+    class RRequire(text: String) : Specs(text)
+    class SimpleSpecs(text: String) : Specs(text)
+
+    private val extraFields = mapOf<String, Triple<String, List<Specs>, KClass<*>>>(
+        "BurialMethods" to Triple("iconResId",
+            listOf(
+                RRequire("%T.drawable.ic_cremation"),
+                RRequire("%T.drawable.ic_earth_burial"),
+                RRequire("%T.drawable.ic_earth_burial"),
+                RRequire("%T.drawable.ic_reburial"),
+                RRequire("%T.drawable.ic_salvage")
+            ),
+            Int::class),
+        "OrderStatuses" to Triple("iconResId",
+            listOf(
+                RRequire("%T.drawable.ic_status_0"),
+                RRequire("%T.drawable.ic_status_4"),
+                RRequire("%T.drawable.ic_status_2"),
+                RRequire("%T.drawable.ic_status_3"),
+                RRequire("%T.drawable.ic_status_1")
+            ),
+            Int::class),
+        "Languages" to Triple("locale",
+            listOf(
+                SimpleSpecs("en"),
+                SimpleSpecs("de"),
+                SimpleSpecs("pl")
+            ),
+            String::class),
+        "ExternalStatuses" to Triple("iconResId",
+            listOf(
+                RRequire("%T.drawable.ic_status_0"),
+                RRequire("%T.drawable.ic_status_2"),
+                RRequire("%T.drawable.ic_status_3")
+            ),
+            Int::class)
+    )
 
     private fun createMapHelper(packageName: String) {
         val syncParams = ClassName("$packageName.sync.content", "GetContent").nestedClass("SyncParams")
@@ -688,9 +846,10 @@ class KotlinApiBuilder(
 
         val map = mutableSetOf<String>()
 
-        models.forEach { entry ->
-            val name = entry.key
+        mods.forEach { entry ->
+            val name = entry.name
             if (skipSyncDataModels(name)) return@forEach // skip
+            if (name == "PersonGroup") return@forEach
             val entity = ClassName("$packageName.sync.entity", name + syncDtoPostfix)
             val mapper = ClassName("$packageName.sync.mapper", name + "Mapper")
             val returnEntity = ClassName("$packageName.database.entity", name)
@@ -700,17 +859,24 @@ class KotlinApiBuilder(
                 .addParameter("mapper", mapper)
                 .returns(returnEntity)
                 .addStatement("val entity = mapper.map(%L)", name.decapitalize())
-            entry.value.properties?.forEach {
-                if (it.key.startsWith("id") && it.value.type == INTEGER_SWAGGER_TYPE) {
-                    val fieldName = if (it.key == "id") {
-                        it.key + name
-                    } else {
-                        it.key
+
+            if (entry.name == "Translation") {
+                f.addModifiers(KModifier.OPEN)
+            }
+
+            if (entry is ObjectEntity) {
+                entry.props.forEach {
+                    if (it.name.startsWith("id") && it is IntegerProp) {
+                        val fieldName = if (it.name == "id") {
+                            it.name + name
+                        } else {
+                            it.name
+                        }
+                        val field = fieldName.substring(2)
+                        val mapName = resolveMapHelperMatch(field).decapitalize() + "Id"
+                        map.add(mapName)
+                        f.addStatement("entity.%L = %L[entity.%L]?.localId", it.name, mapName, it.name)
                     }
-                    val field = fieldName.substring(2)
-                    val mapName = resolveEntityNameMatch(field).decapitalize() + "Id"
-                    map.add(mapName)
-                    f.addStatement("entity.%L = %L[entity.%L]?.localId", it.key, mapName, it.key)
                 }
             }
 
@@ -731,6 +897,14 @@ class KotlinApiBuilder(
 
     private fun resolveEntityNameMatch(field: String): String {
         return when(field) {
+            "ContactPersonGroup" -> "PersonGroup"
+            "ReportTemplate" -> "Report"
+            else -> resolveMapHelperMatch(field)
+        }
+    }
+
+    private fun resolveMapHelperMatch(field: String): String {
+        return when(field) {
             "Taxinfo" -> "TaxInfo"
             "ContactPerson",
             "CreatorPerson" -> "Person"
@@ -740,18 +914,6 @@ class KotlinApiBuilder(
             "ContactFrom" -> "Contact"
             "ReceiptFrom" -> "Receipt"
             "HeadOfficeCompany" -> "Company"
-            "ReportTemplate" -> "Report"
-            "ContactPersonGroup" -> "PersonGroup"
-            else -> field
-        }
-    }
-
-    private fun resolveEnumNameMatch(field: String, entity: String): String {
-        return when(entity to field) {
-            "Fax" to "category" -> "FaxCategory"
-            "Phone" to "category" -> "PhoneCategory"
-            "Item" to "group" -> "ItemGroup"
-            "OrderItem" to "group" -> "ItemGroup"
             else -> field
         }
     }
@@ -767,8 +929,8 @@ class KotlinApiBuilder(
 
         val map = mutableSetOf<String>()
 
-        models.forEach { entry ->
-            val name = entry.key
+        mods.forEach { entry ->
+            val name = entry.name
             if (skipSyncDataModels(name)) return@forEach // skip
             val syncEntity = ClassName("$packageName.sync.entity", name + syncDtoPostfix)
             val mapper = ClassName("$packageName.sync.mapper", name + "Mapper")
@@ -778,17 +940,24 @@ class KotlinApiBuilder(
                 .addParameter(name.decapitalize(), databaseEntity)
                 .addParameter("mapper", mapper)
                 .returns(syncEntity)
-            entry.value.properties?.forEach {
-                if (it.key.startsWith("id") && it.value.type == INTEGER_SWAGGER_TYPE) {
-                    val databaseFieldName = if (it.key == "id") {
-                        it.key + name
-                    } else {
-                        it.key
+
+            if (entry.name == "Translation") {
+                f.addModifiers(KModifier.OPEN)
+            }
+
+            if (entry is ObjectEntity) {
+                entry.props.forEach {
+                    if (it.name.startsWith("id") && it is IntegerProp) {
+                        val databaseFieldName = if (it.name == "id") {
+                            it.name + name
+                        } else {
+                            it.name
+                        }
+                        val field = databaseFieldName.substring(2)
+                        val mapName = resolveMapHelperMatch(field).decapitalize() + "Id"
+                        map.add(mapName)
+                        f.addStatement("%L.add(%L.%L)", mapName, name.decapitalize(), it.name)
                     }
-                    val field = databaseFieldName.substring(2)
-                    val mapName = resolveEntityNameMatch(field).decapitalize() + "Id"
-                    map.add(mapName)
-                    f.addStatement("%L.add(%L.%L)", mapName, name.decapitalize(), it.key)
                 }
             }
 
@@ -826,136 +995,6 @@ class KotlinApiBuilder(
         "burialCondition"
     )
 
-    private fun createDomainEntities(packageName: String) {
-        for (definition in models) {
-            val parcelize = ClassName("kotlinx.android.parcel", "Parcelize")
-            val parcelable = ClassName("android.os", "Parcelable")
-            val modelClassTypeSpec: TypeSpec.Builder = TypeSpec.classBuilder(definition.key)
-                .addModifiers(KModifier.DATA)
-                .addAnnotation(parcelize)
-                .addSuperinterface(parcelable)
-
-            if (definition.value.properties != null) {
-                val primaryConstructor = FunSpec.constructorBuilder()
-                for (modelProperty in definition.value.properties) {
-                    var typeName: TypeName = if (modelProperty.key in enums || ((modelProperty.value is StringProperty
-                            && ((modelProperty.value as StringProperty).enum != null)))) {
-                        ClassName("de.weinandit.bestatterprogramma.base.model", modelProperty.key.capitalize()).asNullable()
-                    } else {
-                        getTypeName(modelProperty)
-                    }
-                    var name = modelProperty.key
-                    var defaultName = "null"
-                    if (name.startsWith("id") && name.length > 2) {
-                        name = name.substring(2)
-                        val className = if (name.contains("Policeman")
-                            || name.contains("Clerk")
-                            || name.contains("ContactPerson")
-                            || name.contains("Guarantor")) {
-                            "PersonGroup"
-                        } else {
-                            name
-                        }
-                        defaultName = className
-                        typeName = ClassName("$packageName.domain.model", className).requiredOrNullable(modelProperty.value.nullable)
-                        name = name.decapitalize()
-                    }
-                    if (definition.key.contains("Group") && modelProperty.value.type == ARRAY_SWAGGER_TYPE) {
-                        val cl = ClassName("$packageName.domain.model", definition.key.replace("Group", ""))
-                        typeName = List::class.asTypeName().parameterizedBy(cl).asNonNull()
-                        defaultName = "listOf"
-                    }
-                    if (name.contains("Group")) {
-                        typeName = typeName.asNonNull()
-                    }
-                    val propertySpec = PropertySpec.builder(name, typeName)
-                        .mutable()
-                        .initializer(name)
-                        .build()
-                    val parameter = ParameterSpec.builder(name, typeName)
-                    if (typeName.nullable) {
-                        parameter.defaultValue("null")
-                    } else {
-                        parameter.defaultValue("%L()", defaultName)
-                    }
-                    primaryConstructor.addParameter(parameter.build())
-                    modelClassTypeSpec.addProperty(propertySpec)
-                }
-                modelClassTypeSpec.primaryConstructor(primaryConstructor.build())
-
-                domainEntitiesSpec.add(modelClassTypeSpec.build())
-            }
-        }
-    }
-
-    private fun createDomainMappers(packageName: String) {
-        for (definition in models) {
-            val modelClassTypeSpec: TypeSpec.Builder = TypeSpec.classBuilder(definition.key + "Mapper")
-            if (definition.value.properties != null) {
-                val domainEntity = ClassName("$packageName.domain.model", definition.key)
-                val databaseEntity = ClassName("$packageName.database.entity", definition.key + "Entity")
-
-                val parameters = definition.value.properties.filter {
-                    it.value.type != ARRAY_SWAGGER_TYPE
-                }
-                val statement = parameters.entries.joinToString(separator = ",\n    ", prefix = "(\n    ", postfix = "\n)") {
-                    var param = it.key
-                    if (it.key in enums || (it.value is StringProperty
-                            && ((it.value as StringProperty).enum != null))) {
-                        return@joinToString "$param = entity.$param?.toString()"
-                    }
-                    if (it.value.type == REF_SWAGGER_TYPE) {
-                        param = "id${param.capitalize()}"
-                        return@joinToString "$param = entity.${it.key}?.id"
-                    }
-                    if (param.startsWith("id") && param.length > 2) {
-                        var name = param.substring(2).decapitalize()
-                        if (!param.contains("Group")) {
-                            name += "?"
-                        }
-                        return@joinToString "$param = entity.$name.id"
-                    }
-                    if (param == "id") {
-                        param += definition.key
-                    }
-                    return@joinToString "$param = entity.${it.key}"
-                }
-                val classes = mutableListOf<TypeName>()
-                val mapped = parameters.entries.map {
-                    var param = it.key
-                    if (it.key in enums || (it.value is StringProperty
-                            && ((it.value as StringProperty).enum != null))) {
-                        classes.add(ClassName("de.weinandit.bestatterprogramma.base.model", param.capitalize()))
-                        return@map "$param = entity.$param?.let { %T.from(it) }"
-                    }
-                    if (param.startsWith("id") && param.length > 2 || it.value.type == REF_SWAGGER_TYPE) {
-                        return@map null
-                    }
-                    if (param == "id") {
-                        param += definition.key
-                    }
-                    return@map "${it.key} = entity.$param"
-                }.filterNotNull()
-
-                val statementFrom = mapped.joinToString(separator = ",\n    ", prefix = "(\n    ", postfix = "\n)")
-                val block = CodeBlock.of(statementFrom, *classes.toTypedArray())
-
-                val funcFromSyncToDatabase = FunSpec.builder("transform")
-                    .addParameter("entity", domainEntity)
-                    .addStatement("return %T%L", databaseEntity, statement)
-                    .build()
-                val funcFromDatabaseToSync = FunSpec.builder("transform")
-                    .addParameter("entity", databaseEntity)
-                    .addStatement("return %T%L", domainEntity, block)
-                    .build()
-
-                modelClassTypeSpec.addFunction(funcFromSyncToDatabase)
-                modelClassTypeSpec.addFunction(funcFromDatabaseToSync)
-                domainMappersSpec.add(modelClassTypeSpec.build())
-            }
-        }
-    }
-
     private fun findDefinition(name: String): Schema<Any> {
         return swaggerModel.components.schemas[name] ?: throw IllegalArgumentException()
     }
@@ -975,6 +1014,120 @@ class KotlinApiBuilder(
                 }
             }
         }
+    }
+
+    private fun createUndoTriggers(packageName: String) {
+        val modelClassTypeSpec = TypeSpec.classBuilder("TriggersHelper")
+        val insertTriggers = mutableListOf<String>()
+        val updateTriggers = mutableListOf<String>()
+        val deleteTriggers = mutableListOf<String>()
+        val deleteTriggerCommands = mutableListOf<String>()
+
+        for (definition in modLinks) {
+            val modelName = definition.name
+            if (skipSyncDataModels(modelName)) continue // skip
+            if (definition is ObjectEntity) {
+                val primaryConstructor = FunSpec.constructorBuilder()
+                val mutableProps = definition.props.toMutableList()
+                if (!definition.name.contains("Link") && !mutableProps.map { it.name }.contains("id")) {
+                    mutableProps.add(IntegerProp("id"))
+                }
+                if (definition.name == "IncomingPayment") {
+                    mutableProps.add(DateProp("modified"))
+                }
+                if (definition.name == "PersonGroup") {
+                    mutableProps.add(StringProp("type"))
+                }
+                val props = mutableListOf<String>()
+                for (property in mutableProps) {
+                    if (property is ArrayProp && property.type !is StringProp
+                        && property.type !is DateProp
+                        && property.type !is EnumProp) {
+                        continue
+                    }
+                    var databasePropertyName = property.name
+                    if (property is ObjectProp) {
+                        databasePropertyName = "id${databasePropertyName.capitalize()}"
+                    }
+                    if (property.name == "id") {
+                        databasePropertyName += modelName
+                    }
+                    props.add(databasePropertyName.snake())
+                }
+
+                val tableName = modelName.snake()
+                val insertTrigger = "CREATE TEMP TRIGGER ${tableName}_it AFTER INSERT ON `$tableName` BEGIN\n" +
+                    "  INSERT INTO undolog VALUES(NULL,'DELETE FROM `$tableName` WHERE rowid='||new.rowid);\n" +
+                    "END;"
+                insertTriggers.add(insertTrigger)
+
+                val updateTriggerBuilder = StringBuilder()
+                val updateStart = "CREATE TEMP TRIGGER ${tableName}_ut AFTER UPDATE ON `$tableName` BEGIN\n" +
+                    "  INSERT INTO undolog VALUES(NULL,'UPDATE `$tableName`\n" +
+                    "     SET "
+                val updateEnding = "\n" +
+                    "   WHERE rowid='||old.rowid);\n" +
+                    "END;"
+
+                updateTriggerBuilder.append(updateStart)
+
+                updateTriggerBuilder.append(
+                    props.joinToString { "$it='||quote(old.$it)||'" }
+                )
+
+                updateTriggerBuilder.append(updateEnding)
+                val updateTrigger = updateTriggerBuilder.toString()
+                updateTriggers.add(updateTrigger)
+
+                val deleteTriggerBuilder = StringBuilder()
+
+                /*"CREATE TEMP TRIGGER ${tableName}_dt BEFORE DELETE ON $tableName BEGIN\n" +
+                    "  INSERT INTO undolog VALUES(NULL,'INSERT INTO $tableName(rowid,a,b,c)\n" +
+                    "    VALUES('||old.rowid||','||quote(old.a)||','||quote(old.b)||\n" +
+                    "           ','||quote(old.c)||')');\n" +
+                    "END;"*/
+
+                val deleteStart = "CREATE TEMP TRIGGER ${tableName}_dt BEFORE DELETE ON `$tableName` BEGIN\n" +
+                    "  INSERT INTO undolog VALUES(NULL,'INSERT INTO `$tableName`("
+
+                deleteTriggerBuilder.append(deleteStart).append("rowid").append(",")
+                deleteTriggerBuilder.append(
+                    props.joinToString { it }
+                )
+                deleteTriggerBuilder.append(")\n")
+
+                deleteTriggerBuilder.append("    VALUES(").append("'||old.rowid||'").append(",")
+                deleteTriggerBuilder.append(
+                    props.joinToString { "'||quote(old.$it)||'" }
+                )
+                deleteTriggerBuilder.append(")');\nEND;")
+
+                val deleteTrigger = deleteTriggerBuilder.toString()
+                deleteTriggers.add(deleteTrigger)
+
+                deleteTriggerCommands.add("DROP TRIGGER ${tableName}_it;")
+                deleteTriggerCommands.add("DROP TRIGGER ${tableName}_ut;")
+                deleteTriggerCommands.add("DROP TRIGGER ${tableName}_dt;")
+            }
+        }
+
+        val allTriggers = insertTriggers + updateTriggers + deleteTriggers
+
+        modelClassTypeSpec.addProperty(PropertySpec.builder("triggers", List::class.parameterizedBy(String::class))
+            .initializer(allTriggers.joinToString(separator = ",\n", prefix = "listOf(\n", postfix = "\n)", transform = { "%S" }),
+                *allTriggers.toTypedArray())
+            .build())
+        modelClassTypeSpec.addProperty(PropertySpec.builder("dropTriggersCommands", List::class.parameterizedBy(String::class))
+            .initializer(deleteTriggerCommands.joinToString(separator = ",\n", prefix = "listOf(\n", postfix = "\n)", transform = { "%S" }),
+                *deleteTriggerCommands.toTypedArray())
+            .build())
+
+        triggersHelperTypeSpec = modelClassTypeSpec.build()
+
+        insertTriggers
+        updateTriggers
+        deleteTriggers
+        deleteTriggerCommands
     }
 
     private fun createApiRetrofitInterface(classNameList: List<String>): TypeSpec {
