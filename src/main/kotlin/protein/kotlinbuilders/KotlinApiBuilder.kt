@@ -111,6 +111,25 @@ class KotlinApiBuilder(
         filterModels()
         mods = convert(models)
         modLinks = convert(modelsWithLinks)
+        /*val links: MutableList<ModelEntity> = mutableListOf()
+        mods.forEach { model ->
+            if (model is ObjectEntity) {
+                model.props.forEach {
+                    if (it is ArrayProp && it.type is ObjectProp) {
+                        val link = ObjectSchema()
+                        val prop = IntegerSchema()
+                        prop.nullable = false
+                        val withoutGroup = it.type.objectName
+                        val key = model.name
+                        link.properties = mutableMapOf()
+                        link.properties["id$withoutGroup"] = prop
+                        link.properties["id$key"] = prop
+                        linkModels[key + withoutGroup + "Link"] = link
+                        links.add(model)
+                    }
+                }
+            }
+        }*/
         val p = proteinApiConfiguration.packageName
 
         createSyncEntityModels(p)
@@ -271,39 +290,32 @@ class KotlinApiBuilder(
 
     private fun createSyncEntityModels(packageName: String) {
         for (definition in mods) {
-            val modelClassTypeSpec: TypeSpec.Builder
-                = TypeSpec.classBuilder(definition.name + syncDtoPostfix)
+            val modelClassTypeSpec: TypeSpec.Builder = TypeSpec.classBuilder(definition.name + syncDtoPostfix)
                 .addModifiers(KModifier.DATA)
             if (definition is ObjectEntity) {
                 val primaryConstructor = FunSpec.constructorBuilder()
                 for (property in definition.props) {
                     val (type, default) = getType(property).let {
-                        if (property is ObjectProp) {
-                            ClassName("$packageName.sync.entity", property.name + syncDtoPostfix).asNullable() to CodeBlock.of("null")
-                        }
-                        if (property is ArrayProp) {
-                            (when {
+                        when (property) {
+                            is ObjectProp -> ClassName("$packageName.sync.entity", property.objectName + syncDtoPostfix).asNullable() to CodeBlock.of("null")
+                            is ArrayProp -> (when {
                                 property.type is ObjectProp -> List::class.asTypeName()
-                                    .parameterizedBy(ClassName("$packageName.sync.entity",
-                                        property.type.objectName.let {
-                                            (if (!it.endsWith("Dto")) it + syncDtoPostfix else it).replace("Sync", "")
-                                        }))
+                                    .parameterizedBy(ClassName("$packageName.sync.entity", property.type.objectName + syncDtoPostfix))
                                     .asNonNull()
                                 property.type is EnumProp -> List::class.parameterizedBy(String::class).asNonNull()
                                 else -> it.asNonNull()
                             }) to CodeBlock.of("%L()", "listOf")
-                        } else (if (property is EnumProp)
-                            String::class.asTypeName().asNullable()
-                        else it.asNullable()) to CodeBlock.of("null")
+                            else -> (if (property is EnumProp)
+                                String::class.asTypeName().asNullable()
+                            else it.asNullable()) to CodeBlock.of("null")
+                        }
                     }
                     val propertySpec = PropertySpec.builder(property.name, type)
                         .addAnnotation(AnnotationSpec.builder(SerializedName::class)
                             .addMember("\"${property.name}\"")
                             .build())
                         .initializer(property.name)
-                    if (property is ArrayProp) {
-                        propertySpec.mutable()
-                    }
+                        .mutable()
                     val parameter = ParameterSpec.builder(property.name, type)
                         .defaultValue(default)
                     primaryConstructor.addParameter(parameter.build())
@@ -323,6 +335,9 @@ class KotlinApiBuilder(
         val baseEntityInterface = ClassName("$packageName.database.entity", "BaseEntity")
         val deletableEntityInterface = ClassName("$packageName.database.entity", "DeletableEntity")
         val sharedInterface = ClassName("$packageName.database.entity", "SharedData")
+        val creatableEntityInterface = ClassName("$packageName.database.entity", "Creatable")
+        val associableEntityInterface = ClassName("$packageName.database.entity", "Associable")
+        val favoritableEntityInterface = ClassName("$packageName.database.entity", "Favoritable")
 
         for (definition in modLinks) {
             val modelName = definition.name
@@ -337,33 +352,33 @@ class KotlinApiBuilder(
             var base = baseEntityInterface
 
             if (definition is ObjectEntity) {
-                if (when(definition.name) {
-                    "Phone", "Fax", "Email", "Www" -> true
+                if (when (modelName) {
+                        "Phone", "Fax", "Email", "Www" -> true
                         else -> false
-                }) {
+                    }) {
                     continue
                 }
                 val primaryConstructor = FunSpec.constructorBuilder()
                 val mutableProps = definition.props.toMutableList()
-                if (!definition.name.contains("Link") && !mutableProps.map { it.name }.contains("id")) {
+                if (!modelName.contains("Link") && !mutableProps.map { it.name }.contains("id")) {
                     mutableProps.add(IntegerProp("id"))
                 }
-                if (definition.name == "IncomingPayment") {
-                    mutableProps.add(DateProp("modified"))
-                }
-                if (definition.name == "PersonGroup") {
+                if (modelName == "PersonGroup") {
                     mutableProps.add(StringProp("type"))
+                }
+                if (modelName.isFavoritableEntity()) {
+                    mutableProps.add(BoolProp("isFavorite"))
                 }
                 for (property in mutableProps) {
                     if (property is ArrayProp && property.type !is StringProp
-                            && property.type !is DateProp
-                            && property.type !is EnumProp) {
+                        && property.type !is DateProp
+                        && property.type !is EnumProp) {
                         continue
                     }
                     var propertyName = property.name
                     var databasePropertyName = propertyName
                     val nullValue = CodeBlock.of("null")
-                    val (typeName, default) = when(property) {
+                    val (typeName, default) = when (property) {
                         is ObjectProp -> {
                             propertyName = "id${propertyName.capitalize()}"
                             databasePropertyName = propertyName
@@ -376,14 +391,14 @@ class KotlinApiBuilder(
                             } else getType(property).asNonNull() to CodeBlock.of("%L()", "listOf")
                         }
                         else -> {
-                            if (linkModels.containsKey(definition.name)) {
+                            if (linkModels.containsKey(modelName)) {
                                 getType(property).asNonNull() to CodeBlock.of("%L", 0)
                             } else getType(property).asNullable() to nullValue
                         }
                     }
                     val propertySpecBuilder = if (property.name == "id") {
                         databasePropertyName = propertyName + modelName
-                        PropertySpec.builder(propertyName , typeName)
+                        PropertySpec.builder(propertyName, typeName)
                             .addModifiers(KModifier.OVERRIDE)
                             .addAnnotation(AnnotationSpec.builder(PrimaryKey::class)
                                 .addMember("autoGenerate = true")
@@ -403,6 +418,16 @@ class KotlinApiBuilder(
                         propertySpecBuilder.addModifiers(KModifier.OVERRIDE)
                     }
 
+                    if (propertyName == "idPersonGroup" && modelName != "PersonGroupLink") {
+                        propertySpecBuilder.addModifiers(KModifier.OVERRIDE)
+                        modelClassTypeSpec.addSuperinterface(associableEntityInterface)
+                    }
+
+                    if (propertyName == "idPersonCreator") {
+                        propertySpecBuilder.addModifiers(KModifier.OVERRIDE)
+                        modelClassTypeSpec.addSuperinterface(creatableEntityInterface)
+                    }
+
                     val propertySpec = propertySpecBuilder
                         .initializer(propertyName)
                         .addAnnotation(AnnotationSpec.builder(ColumnInfo::class)
@@ -411,12 +436,18 @@ class KotlinApiBuilder(
                         .mutable()
                         .build()
                     val parameter = ParameterSpec.builder(propertyName, typeName)
-                    if (property.name == "isShared") {
-                        parameter.defaultValue("false")
-                        modelClassTypeSpec.addSuperinterface(sharedInterface)
-                        parameter.addModifiers(KModifier.OVERRIDE)
-                    } else {
-                        parameter.defaultValue(default)
+                    when (property.name) {
+                        "isShared" -> {
+                            parameter.defaultValue("false")
+                            modelClassTypeSpec.addSuperinterface(sharedInterface)
+                            parameter.addModifiers(KModifier.OVERRIDE)
+                        }
+                        "isFavorite" -> {
+                            parameter.defaultValue("false")
+                            modelClassTypeSpec.addSuperinterface(favoritableEntityInterface)
+                            parameter.addModifiers(KModifier.OVERRIDE)
+                        }
+                        else -> parameter.defaultValue(default)
                     }
                     primaryConstructor.addParameter(parameter.build())
                     modelClassTypeSpec.addProperty(propertySpec)
@@ -426,7 +457,7 @@ class KotlinApiBuilder(
                 val entityAnnotationSpec = AnnotationSpec.builder(Entity::class)
                     .addMember("%L = %S", "tableName", modelName.snake())
 
-                if (!linkModels.containsKey(definition.name)) {
+                if (!linkModels.containsKey(modelName)) {
                     val fields = mutableProps.map { it.name }
                     if (!fields.contains("created") && !fields.contains("modified")) {
                         base = idEntityInterface
@@ -439,7 +470,7 @@ class KotlinApiBuilder(
                 val indices = mutableListOf<AnnotationSpec>()
                 val foreignKeysAnnotations = foreignKeys.map {
                     val parent = it
-                    val resolvedParent = resolveEntityNameMatch(parent.substring(2))
+                    val resolvedParent = resolveEntityNameMatch(parent.substring(2), definition.name)
                     val entityClass = ClassName("$packageName.database.entity", resolvedParent)
                     indices.add(AnnotationSpec.builder(Index::class)
                         .addMember("%L = arrayOf(%S)", "value", it.snake())
@@ -463,6 +494,13 @@ class KotlinApiBuilder(
         }
 
         return classNameList
+    }
+
+    private fun String.isFavoritableEntity(): Boolean {
+        return when (this) {
+            "Order", "Todo", "Appointment", "Company", "Person" -> true
+            else -> false
+        }
     }
 
     enum class DaoClass {
@@ -626,7 +664,7 @@ class KotlinApiBuilder(
         val sortedDao = daoTypeSpec.sortedWith(compareBy { it.name })
 
         sortedDao.forEach {
-            val name = it.name?: "none"
+            val name = it.name ?: "none"
             val type = ClassName("$packageName.database.dao", name)
             modelClassTypeSpec.addFunction(FunSpec.builder(name.decapitalize())
                 .returns(type)
@@ -637,7 +675,7 @@ class KotlinApiBuilder(
         val depends = FunSpec.builder("depend")
         depends.addCode("/*\n")
         sortedDao.forEach {
-            val name = it.name?: "none"
+            val name = it.name ?: "none"
             depends.addStatement("single { get<BMSDatabase>().%L() }", name.decapitalize())
         }
         depends.addCode("\n*/")
@@ -674,14 +712,14 @@ class KotlinApiBuilder(
                     if (it is ArrayProp) {
                         if (it.type is EnumProp) {
                             val name = it.type.enumName
-                            val enum = swaggerModel.components.schemas[name]?.enum?.apply { remove("none") }?: listOf()
+                            val enum = swaggerModel.components.schemas[name]?.enum?.apply { remove("none") } ?: listOf()
                             enums2[name] = enum as List<String>
                             return@joinToString "$param = entity.$param.map { it.toString() }"
                         }
                     }
                     if (it is EnumProp) {
                         val name = it.enumName
-                        val enum = swaggerModel.components.schemas[name]?.enum?.apply { remove("none") }?: listOf()
+                        val enum = swaggerModel.components.schemas[name]?.enum?.apply { remove("none") } ?: listOf()
                         enums2[name] = enum as List<String>
                         return@joinToString "$param = entity.$param?.toString()"
                     }
@@ -708,7 +746,7 @@ class KotlinApiBuilder(
                         return@map null
                     }
                     return@map "${it.name} = entity.$param"
-                }.filterNotNull().let { if (definition.name == "PersonGroup") it.toMutableList().apply { add("type = type") } else it  }
+                }.filterNotNull().let { if (definition.name == "PersonGroup") it.toMutableList().apply { add("type = type") } else it }
 
                 val statement = mapped.joinToString(separator = ",\n    ", prefix = "(\n    ", postfix = "\n)")
                 val block = CodeBlock.of(statement, *classes.toTypedArray())
@@ -739,7 +777,7 @@ class KotlinApiBuilder(
             val spec = TypeSpec.enumBuilder(name)
             list.forEachIndexed { index, n ->
                 val enumName = n.replace(" ", "_")
-                val stringName = when(enumName) {
+                val stringName = when (enumName) {
                     "public", "private", "void", "new" -> enumName + "_text"
                     else -> enumName
                 }
@@ -854,28 +892,31 @@ class KotlinApiBuilder(
             val mapper = ClassName("$packageName.sync.mapper", name + "Mapper")
             val returnEntity = ClassName("$packageName.database.entity", name)
 
+            val paramName = name.decapitalize()
+
             val f = FunSpec.builder("map")
-                .addParameter(name.decapitalize(), entity)
+                .addParameter(paramName, entity)
                 .addParameter("mapper", mapper)
                 .returns(returnEntity)
-                .addStatement("val entity = mapper.map(%L)", name.decapitalize())
 
             if (entry.name == "Translation") {
                 f.addModifiers(KModifier.OPEN)
             }
 
+            f.addStatement("val entity = mapper.map(%L)", paramName)
+
             if (entry is ObjectEntity) {
-                entry.props.forEach {
-                    if (it.name.startsWith("id") && it is IntegerProp) {
-                        val fieldName = if (it.name == "id") {
-                            it.name + name
+                entry.props.forEach { p ->
+                    recursive(p, f, paramName) { prop, paramName ->
+                        val fieldName = if (prop.name == "id") {
+                            prop.name + name
                         } else {
-                            it.name
+                            prop.name
                         }
                         val field = fieldName.substring(2)
-                        val mapName = resolveMapHelperMatch(field).decapitalize() + "Id"
+                        val mapName = resolveMapHelperMatch(field, name).decapitalize() + "Id"
                         map.add(mapName)
-                        f.addStatement("entity.%L = %L[entity.%L]?.localId", it.name, mapName, it.name)
+                        f.addStatement("entity.%L = %L[entity.%L]?.localId", prop.name, mapName, prop.name)
                     }
                 }
             }
@@ -895,22 +936,59 @@ class KotlinApiBuilder(
         mapHelperTypeSpec = modelClassTypeSpec.build()
     }
 
-    private fun resolveEntityNameMatch(field: String): String {
-        return when(field) {
-            "ContactPersonGroup" -> "PersonGroup"
-            "ReportTemplate" -> "Report"
-            else -> resolveMapHelperMatch(field)
+    private fun recursive(prop: Prop, f: FunSpec.Builder, paramName: String, func: (Prop, String) -> Unit) {
+        when (prop) {
+            is IntegerProp -> {
+                if (prop.name.startsWith("id")) {
+                    func(prop, paramName)
+                }
+            }
+            /*is ObjectProp -> {
+                f.addStatement("$paramName.${prop.name}?.let {")
+                mods.find { it.name == prop.objectName }?.let {
+                    if (it is ObjectEntity) {
+                        it.props.forEach { recursive(it, f, "it", func) }
+                    }
+                }
+                f.addStatement("}")
+            }
+            is ArrayProp -> {
+                if (prop.type is ObjectProp) {
+                    f.addStatement("$paramName.${prop.name}.forEach {")
+                    mods.find { it.name == prop.type.objectName }?.let {
+                        if (it is ObjectEntity) {
+                            it.props.forEach { recursive(it, f, "it", func) }
+                        }
+                    }
+                    f.addStatement("}")
+                }
+            }*/
         }
     }
 
-    private fun resolveMapHelperMatch(field: String): String {
-        return when(field) {
+    private fun resolveEntityNameMatch(field: String, entity: String): String {
+        return when (field) {
+            "ContactPersonGroup" -> "PersonGroup"
+            "ReportTemplate" -> "Report"
+            "Payer" -> "Contact"
+            else -> resolveMapHelperMatch(field, entity)
+        }
+    }
+
+    private fun resolveMapHelperMatch(field: String, entity: String): String {
+        if (field.startsWith("ContactUnit")) {
+            return "ContactUnit"
+        }
+        if (field.startsWith("Person")) {
+            if (field == "PersonGroup" || field == "PersonCategory") return field
+            return "Person"
+        }
+        return when (field) {
             "Taxinfo" -> "TaxInfo"
-            "ContactPerson",
-            "CreatorPerson" -> "Person"
+            "ContactPerson", "PersonCreator", "CreatorPerson" -> "Person"
             "SecondPayer" -> "Payer"
             "Type" -> "ItemType"
-            "Category" -> "ItemCategory"
+            "Category" -> if (entity == "ItemCategoryType") "ItemCategory" else "Category"
             "ContactFrom" -> "Contact"
             "ReceiptFrom" -> "Receipt"
             "HeadOfficeCompany" -> "Company"
@@ -918,7 +996,10 @@ class KotlinApiBuilder(
         }
     }
 
-    private fun skipSyncDataModels(name: String): Boolean = (name == "SyncData" || name == "SyncMap")
+    private fun skipSyncDataModels(name: String): Boolean =
+        name == "SyncData"
+            || name == "SyncMap"
+            || name == "PermissionSyncInfo"
 
     private fun createPutMapHelper(packageName: String) {
         val ttt = ClassName("", "MutableSet")
@@ -954,7 +1035,7 @@ class KotlinApiBuilder(
                             it.name
                         }
                         val field = databaseFieldName.substring(2)
-                        val mapName = resolveMapHelperMatch(field).decapitalize() + "Id"
+                        val mapName = resolveMapHelperMatch(field, name).decapitalize() + "Id"
                         map.add(mapName)
                         f.addStatement("%L.add(%L.%L)", mapName, name.decapitalize(), it.name)
                     }
@@ -1031,9 +1112,6 @@ class KotlinApiBuilder(
                 val mutableProps = definition.props.toMutableList()
                 if (!definition.name.contains("Link") && !mutableProps.map { it.name }.contains("id")) {
                     mutableProps.add(IntegerProp("id"))
-                }
-                if (definition.name == "IncomingPayment") {
-                    mutableProps.add(DateProp("modified"))
                 }
                 if (definition.name == "PersonGroup") {
                     mutableProps.add(StringProp("type"))
@@ -1336,14 +1414,6 @@ class KotlinApiBuilder(
             if (swaggerModel.components.schemas[name]?.type == "string") {
                 return TypeVariableName(String::class.simpleName!!)
             }
-            if (isDto) {
-                val newName = if (!name.endsWith("Dto")) {
-                    name + "Dto"
-                } else if (name.endsWith("SyncDto")) {
-                    name.replace("Sync", "")
-                } else name
-                return TypeVariableName.invoke(newName)
-            }
             return TypeVariableName.invoke(name)
         }
         return when (type) {
@@ -1450,18 +1520,13 @@ class KotlinApiBuilder(
             "boolean" -> BoolProp(name)
             "number" -> FloatProp(name)
             "array" -> ArrayProp(name, getProp(name, (schema as ArraySchema).items))
-            else -> {
-                val ref = schema.`$ref`
-                if (ref != null) {
-                    parseReference(name, ref)
-                } else Prop(name)
-            }
+            else -> schema.`$ref`?.let { parseReference(name, it) } ?: Prop(name)
         }
     }
 
     fun parseReference(name: String, ref: String): Prop {
         val objects = swaggerModel.components.schemas
-        val refName = RefUtils.computeDefinitionName(ref)
+        val refName = RefUtils.computeDefinitionName(ref).removeSuffix()
         return if (objects[refName]?.enum != null) {
             EnumProp(name, refName)
         } else ObjectProp(name, refName)
@@ -1490,7 +1555,7 @@ class KotlinApiBuilder(
             while (i < types.size) {
                 val name = types[i]
                 val definition = findDefinition(name)
-                val key = name.replace(Regex("SyncDto\\b|Dto\\b"), "")
+                val key = name.removeSuffix()
                 models[key] = definition
                 if (key.contains("Group") && key != "PriceGroupTypes") {
                     val link = ObjectSchema()
@@ -1508,5 +1573,9 @@ class KotlinApiBuilder(
         }
         modelsWithLinks.putAll(models)
         modelsWithLinks.putAll(linkModels)
+    }
+
+    private fun String.removeSuffix(): String {
+        return replace(Regex("SyncDto\\b|Dto\\b"), "")
     }
 }
