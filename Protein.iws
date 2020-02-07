@@ -5,11 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="426404f3-14cf-4cf9-be47-115388e0e4f1" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/Protein.ipr" beforeDir="false" afterPath="$PROJECT_DIR$/Protein.ipr" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Protein.iws" beforeDir="false" afterPath="$PROJECT_DIR$/Protein.iws" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/protein/kotlinbuilders/KotlinApiBuilder.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/protein/kotlinbuilders/KotlinApiBuilder.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/version.properties" beforeDir="false" afterPath="$PROJECT_DIR$/version.properties" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.gradle/" />
     <ignored path="$PROJECT_DIR$/build/" />
@@ -67,8 +64,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/kotlin/protein/kotlinbuilders/KotlinApiBuilder.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="305">
-              <caret line="997" lean-forward="true" selection-start-line="997" selection-end-line="997" />
+            <state relative-caret-position="833">
+              <caret line="998" lean-forward="true" selection-start-line="998" selection-end-line="998" />
               <folding>
                 <element signature="e#32#2307#0" expanded="true" />
                 <element signature="e#4715#5561#0" />
@@ -78,15 +75,42 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Protein.ipr">
-          <provider selected="true" editor-type-id="text-editor" />
+        <entry file="file://$PROJECT_DIR$/src/main/kotlin/protein/kotlinbuilders/ProteinApiConfiguration.kt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="32">
+              <caret line="2" column="23" selection-start-line="2" selection-start-column="23" selection-end-line="2" selection-end-column="23" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/protein/steps/PackageInfoStep.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1936">
+              <caret line="141" column="46" selection-start-line="141" selection-start-column="46" selection-end-line="141" selection-end-column="46" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/protein/common/Settings.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="736">
+              <caret line="69" column="22" selection-start-line="69" selection-start-column="22" selection-end-line="69" selection-end-column="22" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#1558#1559#0" expanded="true" />
+                <element signature="e#1636#1637#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Protein.iws">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="208">
-              <caret line="13" column="45" lean-forward="true" selection-start-line="13" selection-start-column="45" selection-end-line="13" selection-end-column="45" />
+            <state relative-caret-position="256">
+              <caret line="16" column="45" selection-start-line="16" selection-start-column="45" selection-end-line="16" selection-end-column="45" />
             </state>
           </provider>
         </entry>
@@ -99,7 +123,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/kotlin/protein/AddComponentWizard.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="448">
+            <state relative-caret-position="400">
               <caret line="28" selection-start-line="28" selection-end-line="28" />
               <folding>
                 <element signature="e#17#120#0" expanded="true" />
@@ -111,7 +135,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/build.gradle">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="321">
+            <state relative-caret-position="720">
               <caret line="45" column="4" selection-start-line="45" selection-start-column="4" selection-end-line="45" selection-end-column="4" />
             </state>
           </provider>
@@ -121,7 +145,7 @@
         <entry file="file://$PROJECT_DIR$/version.properties">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="32">
-              <caret line="2" column="7" lean-forward="true" selection-start-line="2" selection-start-column="7" selection-end-line="2" selection-end-column="7" />
+              <caret line="2" column="7" selection-start-line="2" selection-start-column="7" selection-end-line="2" selection-end-column="7" />
             </state>
           </provider>
         </entry>
@@ -129,8 +153,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/protein/common/StorageUtils.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="448">
-              <caret line="45" column="61" selection-start-line="45" selection-start-column="61" selection-end-line="45" selection-end-column="61" />
+            <state relative-caret-position="512">
+              <caret line="49" column="25" selection-start-line="49" selection-start-column="25" selection-end-line="49" selection-end-column="25" />
             </state>
           </provider>
         </entry>
@@ -147,10 +171,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>addSuperinterface</find>
-      <find>enums</find>
-      <find>string</find>
-      <find>databasePropertyName</find>
       <find>String::class</find>
       <find>::class.asTypeName()</find>
       <find>String::class.asTypeName()</find>
@@ -177,7 +197,14 @@
       <find>databa</find>
       <find>incoming</find>
       <find>skip</find>
+      <find>de.weinandit.bestatterprogramma</find>
+      <find>de.wein</find>
+      <find>.sync</find>
+      <find>modules</find>
     </findStrings>
+    <replaceStrings>
+      <replace>de.juvopro.bms</replace>
+    </replaceStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -226,7 +253,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
@@ -352,6 +378,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -360,7 +387,7 @@
     <property name="Repository.Attach.JavaDocs" value="false" />
     <property name="Repository.Attach.Sources" value="false" />
     <property name="UI_DESIGNER_EDITOR_MODE.UIDesignerToolWindowManager.WIDTH" value="346" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1575283949515" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1575283956135" />
     <property name="editor.config.ad.shown" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/build.gradle" />
     <property name="project.structure.last.edited" value="Artifacts" />
@@ -570,7 +597,7 @@
     <frame x="1912" y="-8" width="1936" height="1176" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.1130064" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.18336888" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -685,7 +712,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
           <url>file://$PROJECT_DIR$/src/main/kotlin/protein/kotlinbuilders/KotlinApiBuilder.kt</url>
-          <line>1207</line>
+          <line>1208</line>
           <properties />
           <option name="timeStamp" value="64" />
         </line-breakpoint>
@@ -747,21 +774,10 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.swagger.parser.v3/swagger-parser-v3/2.0.12/f1dce63a3a52819f6d05237baf077fde004dff6f/swagger-parser-v3-2.0.12-sources.jar!/io/swagger/v3/parser/ResolverCache.java" />
     <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.swagger.parser.v3/swagger-parser-v3/2.0.12/f1dce63a3a52819f6d05237baf077fde004dff6f/swagger-parser-v3-2.0.12-sources.jar!/io/swagger/v3/parser/processors/SchemaProcessor.java" />
     <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.swagger.core.v3/swagger-models/2.0.8/aab943d2941dacc7f07618387110ff7b871bb159/swagger-models-2.0.8-sources.jar!/io/swagger/v3/oas/models/media/NumberSchema.java" />
     <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.swagger/swagger-models/1.5.22/57861cc38afd0f399aaa7741b9a2e2580687af3d/swagger-models-1.5.22-sources.jar!/io/swagger/models/parameters/BodyParameter.java" />
     <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.swagger.core.v3/swagger-models/2.0.8/aab943d2941dacc7f07618387110ff7b871bb159/swagger-models-2.0.8-sources.jar!/io/swagger/v3/oas/models/media/ObjectSchema.java" />
-    <entry file="file://$PROJECT_DIR$/src/main/java/protein/common/Settings.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="256">
-          <caret line="16" column="24" lean-forward="true" selection-start-line="16" selection-start-column="24" selection-end-line="16" selection-end-column="24" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/183.4588.61/1ccb336a53062ca972c07d4677234dbd0783e595/ideaIC-183.4588.61/lib/slf4j-api-1.7.25.jar!/org/slf4j/ILoggerFactory.class" />
     <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/183.4588.61/1ccb336a53062ca972c07d4677234dbd0783e595/ideaIC-183.4588.61/lib/slf4j-api-1.7.25.jar!/org/slf4j/Logger.class" />
     <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/1.7.25/962153db4a9ea71b79d047dfd1b2a0d80d8f4739/slf4j-api-1.7.25-sources.jar!/org/slf4j/ILoggerFactory.java" />
@@ -814,13 +830,6 @@
       </provider>
     </entry>
     <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.3.11/4cbc5922a54376018307a731162ccaf3ef851a39/kotlin-stdlib-1.3.11.jar!/kotlin/collections/CollectionsKt.class" />
-    <entry file="file://$PROJECT_DIR$/src/main/java/protein/steps/PackageInfoStep.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2048">
-          <caret line="148" column="33" selection-start-line="148" selection-start-column="33" selection-end-line="148" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/protein/steps/ModuleSelectorStep.form">
       <provider selected="true" editor-type-id="ui-designer" />
     </entry>
@@ -850,16 +859,59 @@
       </provider>
     </entry>
     <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.swagger.parser.v3/swagger-parser-v3/2.0.12/f1dce63a3a52819f6d05237baf077fde004dff6f/swagger-parser-v3-2.0.12-sources.jar!/io/swagger/v3/parser/util/RefUtils.java" />
-    <entry file="file://$PROJECT_DIR$/src/main/java/protein/common/StorageUtils.java">
+    <entry file="file://$PROJECT_DIR$/Protein.ipr">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/protein/kotlinbuilders/KotlinApiBuilder.kt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="448">
-          <caret line="45" column="61" selection-start-line="45" selection-start-column="61" selection-end-line="45" selection-end-column="61" />
+        <state relative-caret-position="833">
+          <caret line="998" lean-forward="true" selection-start-line="998" selection-end-line="998" />
+          <folding>
+            <element signature="e#32#2307#0" expanded="true" />
+            <element signature="e#4715#5561#0" />
+          </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/kotlin/protein/kotlinbuilders/ProteinApiConfiguration.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="32">
+          <caret line="2" column="23" selection-start-line="2" selection-start-column="23" selection-end-line="2" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/protein/steps/PackageInfoStep.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1936">
+          <caret line="141" column="46" selection-start-line="141" selection-start-column="46" selection-end-line="141" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/protein/common/Settings.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="736">
+          <caret line="69" column="22" selection-start-line="69" selection-start-column="22" selection-end-line="69" selection-end-column="22" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1558#1559#0" expanded="true" />
+            <element signature="e#1636#1637#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Protein.iws">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="256">
+          <caret line="16" column="45" selection-start-line="16" selection-start-column="45" selection-end-line="16" selection-end-column="45" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Protein.iml">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/kotlin/protein/AddComponentWizard.kt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="448">
+        <state relative-caret-position="400">
           <caret line="28" selection-start-line="28" selection-end-line="28" />
           <folding>
             <element signature="e#17#120#0" expanded="true" />
@@ -867,22 +919,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Protein.ipr">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Protein.iws">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="208">
-          <caret line="13" column="45" lean-forward="true" selection-start-line="13" selection-start-column="45" selection-end-line="13" selection-end-column="45" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Protein.iml">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/build.gradle">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="321">
+        <state relative-caret-position="720">
           <caret line="45" column="4" selection-start-line="45" selection-start-column="4" selection-end-line="45" selection-end-column="4" />
         </state>
       </provider>
@@ -890,18 +929,14 @@
     <entry file="file://$PROJECT_DIR$/version.properties">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="32">
-          <caret line="2" column="7" lean-forward="true" selection-start-line="2" selection-start-column="7" selection-end-line="2" selection-end-column="7" />
+          <caret line="2" column="7" selection-start-line="2" selection-start-column="7" selection-end-line="2" selection-end-column="7" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/kotlin/protein/kotlinbuilders/KotlinApiBuilder.kt">
+    <entry file="file://$PROJECT_DIR$/src/main/java/protein/common/StorageUtils.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="305">
-          <caret line="997" lean-forward="true" selection-start-line="997" selection-end-line="997" />
-          <folding>
-            <element signature="e#32#2307#0" expanded="true" />
-            <element signature="e#4715#5561#0" />
-          </folding>
+        <state relative-caret-position="512">
+          <caret line="49" column="25" selection-start-line="49" selection-start-column="25" selection-end-line="49" selection-end-column="25" />
         </state>
       </provider>
     </entry>

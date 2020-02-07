@@ -137,7 +137,7 @@ class KotlinApiBuilder(
         createDao(p)
         createDatabase(p)
         createMappers(p)
-        createEnums("de.weinandit.bestatterprogramma")
+        createEnums("de.juvopro.bms")
         createMapHelper(p)
         createPutMapHelper(p)
         createUndoTriggers(p)
@@ -206,7 +206,7 @@ class KotlinApiBuilder(
         if (isEnums) {
             for (typeSpec in enumListTypeSpec) {
                 StorageUtils.generateFiles(
-                    proteinApiConfiguration.moduleName, "de.weinandit.bestatterprogramma.base.model", typeSpec)
+                    proteinApiConfiguration.moduleName, "de.juvopro.bms.base.model", typeSpec)
             }
         }
         if (isTriggers) {
@@ -384,10 +384,10 @@ class KotlinApiBuilder(
                             databasePropertyName = propertyName
                             Int::class.asTypeName().requiredOrNullable(property.nullable) to nullValue
                         }
-                        is EnumProp -> ClassName("de.weinandit.bestatterprogramma.base.model", property.enumName).asNullable() to nullValue
+                        is EnumProp -> ClassName("de.juvopro.bms.base.model", property.enumName).asNullable() to nullValue
                         is ArrayProp -> {
                             if (property.type is EnumProp) {
-                                Set::class.asTypeName().parameterizedBy(ClassName("de.weinandit.bestatterprogramma.base.model", property.type.enumName)).asNonNull() to CodeBlock.of("%L()", "setOf")
+                                Set::class.asTypeName().parameterizedBy(ClassName("de.juvopro.bms.base.model", property.type.enumName)).asNonNull() to CodeBlock.of("%L()", "setOf")
                             } else getType(property).asNonNull() to CodeBlock.of("%L()", "listOf")
                         }
                         else -> {
@@ -511,10 +511,10 @@ class KotlinApiBuilder(
     private fun createDao(packageName: String) {
         val liveData = ClassName("androidx.lifecycle", "LiveData")
         for (definition in modLinks) {
-            val baseDao = ClassName("de.weinandit.bestatterprogramma.modules.database.dao.base", "BaseDao")
-            val baseIdEntityDao = ClassName("de.weinandit.bestatterprogramma.modules.database.dao.base", "BaseIdEntityDao")
-            val baseEntityDao = ClassName("de.weinandit.bestatterprogramma.modules.database.dao.base", "BaseEntityDao")
-            val baseLinkDao = ClassName("de.weinandit.bestatterprogramma.modules.database.dao.base", "BaseLinkDao")
+            val baseDao = ClassName("de.juvopro.bms.database.dao.base", "BaseDao")
+            val baseIdEntityDao = ClassName("de.juvopro.bms.database.dao.base", "BaseIdEntityDao")
+            val baseEntityDao = ClassName("de.juvopro.bms.database.dao.base", "BaseEntityDao")
+            val baseLinkDao = ClassName("de.juvopro.bms.database.dao.base", "BaseLinkDao")
             val entityName = definition.name
 
             if (skipSyncDataModels(entityName)) continue // skip
@@ -734,12 +734,12 @@ class KotlinApiBuilder(
                     val param = it.name
                     if (it is ArrayProp) {
                         if (it.type is EnumProp) {
-                            classes.add(ClassName("de.weinandit.bestatterprogramma.base.model", it.type.enumName))
+                            classes.add(ClassName("de.juvopro.bms.base.model", it.type.enumName))
                             return@map "$param = entity.$param.mapNotNull { %T.from(it) }.toSet()"
                         }
                     }
                     if (it is EnumProp) {
-                        classes.add(ClassName("de.weinandit.bestatterprogramma.base.model", it.enumName))
+                        classes.add(ClassName("de.juvopro.bms.base.model", it.enumName))
                         return@map "$param = entity.$param?.let { %T.from(it) }"
                     }
                     if (it is ObjectProp) {
@@ -991,7 +991,8 @@ class KotlinApiBuilder(
             "Category" -> if (entity == "ItemCategoryType") "ItemCategory" else "Category"
             "ContactFrom" -> "Contact"
             "ReceiptFrom" -> "Receipt"
-            "HeadOfficeCompany" -> "Company"
+            "HeadOfficeCompany", "CompanyRegister" -> "Company"
+            "OrderOriginatedFrom" -> "Order"
             else -> field
         }
     }
