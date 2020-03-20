@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/src/main/kotlin/protein/kotlinbuilders/KotlinApiBuilder.kt" line="837" mnemonic="9" />
-  </component>
   <component name="ChangeListManager">
     <list default="true" id="426404f3-14cf-4cf9-be47-115388e0e4f1" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/Protein.ipr" beforeDir="false" afterPath="$PROJECT_DIR$/Protein.ipr" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Protein.iws" beforeDir="false" afterPath="$PROJECT_DIR$/Protein.iws" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.jar" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradlew.bat" beforeDir="false" afterPath="$PROJECT_DIR$/gradlew.bat" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/kotlin/protein/kotlinbuilders/KotlinApiBuilder.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/protein/kotlinbuilders/KotlinApiBuilder.kt" afterDir="false" />
     </list>
-    <ignored path="$PROJECT_DIR$/.gradle/" />
-    <ignored path="$PROJECT_DIR$/build/" />
-    <ignored path="$PROJECT_DIR$/out/" />
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -59,108 +56,6 @@
       </state>
     </system>
   </component>
-  <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/kotlin/protein/kotlinbuilders/KotlinApiBuilder.kt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="833">
-              <caret line="998" lean-forward="true" selection-start-line="998" selection-end-line="998" />
-              <folding>
-                <element signature="e#32#2307#0" expanded="true" />
-                <element signature="e#4715#5561#0" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/kotlin/protein/kotlinbuilders/ProteinApiConfiguration.kt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="32">
-              <caret line="2" column="23" selection-start-line="2" selection-start-column="23" selection-end-line="2" selection-end-column="23" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/protein/steps/PackageInfoStep.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1936">
-              <caret line="141" column="46" selection-start-line="141" selection-start-column="46" selection-end-line="141" selection-end-column="46" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/protein/common/Settings.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="736">
-              <caret line="69" column="22" selection-start-line="69" selection-start-column="22" selection-end-line="69" selection-end-column="22" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#1558#1559#0" expanded="true" />
-                <element signature="e#1636#1637#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Protein.iws">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="256">
-              <caret line="16" column="45" selection-start-line="16" selection-start-column="45" selection-end-line="16" selection-end-column="45" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Protein.iml">
-          <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/kotlin/protein/AddComponentWizard.kt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="400">
-              <caret line="28" selection-start-line="28" selection-end-line="28" />
-              <folding>
-                <element signature="e#17#120#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/build.gradle">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="720">
-              <caret line="45" column="4" selection-start-line="45" selection-start-column="4" selection-end-line="45" selection-end-column="4" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/version.properties">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="32">
-              <caret line="2" column="7" selection-start-line="2" selection-start-column="7" selection-end-line="2" selection-end-column="7" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/protein/common/StorageUtils.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="512">
-              <caret line="49" column="25" selection-start-line="49" selection-start-column="25" selection-end-line="49" selection-end-column="25" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
-  </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
@@ -169,65 +64,8 @@
       </list>
     </option>
   </component>
-  <component name="FindInProjectRecents">
-    <findStrings>
-      <find>String::class</find>
-      <find>::class.asTypeName()</find>
-      <find>String::class.asTypeName()</find>
-      <find>enums2</find>
-      <find>public</find>
-      <find>findun</find>
-      <find>modelName</find>
-      <find>listOf</find>
-      <find>codeblock.of</find>
-      <find>joinToString</find>
-      <find>.trimMargin()</find>
-      <find>associa</find>
-      <find>intellij {</find>
-      <find>updateSinceUntilBuild</find>
-      <find>creatorpe</find>
-      <find>helper</find>
-      <find>ObjectProp</find>
-      <find>syncdata</find>
-      <find>syncdto</find>
-      <find>&quot;Sync</find>
-      <find>personcre</find>
-      <find>&quot;sync</find>
-      <find>kotlin</find>
-      <find>databa</find>
-      <find>incoming</find>
-      <find>skip</find>
-      <find>de.weinandit.bestatterprogramma</find>
-      <find>de.wein</find>
-      <find>.sync</find>
-      <find>modules</find>
-    </findStrings>
-    <replaceStrings>
-      <replace>de.juvopro.bms</replace>
-    </replaceStrings>
-  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-  </component>
-  <component name="IdeDocumentHistory">
-    <option name="CHANGED_PATHS">
-      <list>
-        <option value="$PROJECT_DIR$/.editorconfig" />
-        <option value="$PROJECT_DIR$/src/main/java/protein/common/StorageUtils.java" />
-        <option value="$PROJECT_DIR$/src/main/kotlin/protein/extensions/string_extensions.kt" />
-        <option value="$PROJECT_DIR$/src/test/kotlin/KotlinApiBuilderShould.kt" />
-        <option value="$PROJECT_DIR$/src/main/resources/META-INF/plugin.xml" />
-        <option value="$PROJECT_DIR$/src/main/kotlin/protein/tracking/DialogErrorTracking.kt" />
-        <option value="$PROJECT_DIR$/Protein.iml" />
-        <option value="$PROJECT_DIR$/src/main/java/protein/common/Settings.java" />
-        <option value="$PROJECT_DIR$/src/main/java/protein/common/SettingsManager.java" />
-        <option value="$PROJECT_DIR$/src/main/java/protein/steps/PackageInfoStep.form" />
-        <option value="$PROJECT_DIR$/src/main/java/protein/steps/PackageInfoStep.java" />
-        <option value="$PROJECT_DIR$/build.gradle" />
-        <option value="$PROJECT_DIR$/version.properties" />
-        <option value="$PROJECT_DIR$/src/main/kotlin/protein/kotlinbuilders/KotlinApiBuilder.kt" />
-      </list>
-    </option>
   </component>
   <component name="LogFilters">
     <option name="FILTER_ERRORS" value="false" />
@@ -239,181 +77,39 @@
   <component name="NamedScopeManager">
     <scope name="Unnamed" pattern="lib:io.swagger.v3.parser.*" />
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="1912" />
-    <option name="y" value="-8" />
-    <option name="width" value="1400" />
-    <option name="height" value="1000" />
-  </component>
+  <component name="ProjectId" id="1YwSglWtypClQ2FvybU3nuDIzPL" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="1" id="Add" />
   </component>
-  <component name="ProjectView">
-    <navigator proportions="" version="1">
-      <foldersAlwaysOnTop value="true" />
-    </navigator>
-    <panes>
-      <pane id="PackagesPane" />
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="Protein" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Protein" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-            </path>
-            <path>
-              <item name="Protein" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Protein" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Protein" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Protein" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-            </path>
-            <path>
-              <item name="Protein" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Protein" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Protein" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Protein" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="protein" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Protein" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Protein" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="protein" type="462c0819:PsiDirectoryNode" />
-              <item name="common" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Protein" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Protein" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="protein" type="462c0819:PsiDirectoryNode" />
-              <item name="steps" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Protein" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Protein" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="kotlin" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Protein" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Protein" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="kotlin" type="462c0819:PsiDirectoryNode" />
-              <item name="protein" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Protein" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Protein" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="kotlin" type="462c0819:PsiDirectoryNode" />
-              <item name="protein" type="462c0819:PsiDirectoryNode" />
-              <item name="kotlinbuilders" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Protein" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Protein" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="kotlin" type="462c0819:PsiDirectoryNode" />
-              <item name="protein" type="462c0819:PsiDirectoryNode" />
-              <item name="tracking" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Protein" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Protein" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="resources" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Protein" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Protein" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="resources" type="462c0819:PsiDirectoryNode" />
-              <item name="META-INF" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Protein" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Protein" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="test" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-            </path>
-            <path>
-              <item name="Protein" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Protein" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="test" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="kotlin" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Protein" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Protein" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="test" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="kotlin" type="462c0819:PsiDirectoryNode" />
-              <item name="config" type="462c0819:PsiDirectoryNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
-      <pane id="Scope" />
-    </panes>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
     <property name="Downloaded.Files.Path.Enabled" value="false" />
     <property name="Repository.Attach.Annotations" value="false" />
     <property name="Repository.Attach.JavaDocs" value="false" />
     <property name="Repository.Attach.Sources" value="false" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="UI_DESIGNER_EDITOR_MODE.UIDesignerToolWindowManager.WIDTH" value="346" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
     <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1575283956135" />
     <property name="editor.config.ad.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/build.gradle" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="project.structure.last.edited" value="Artifacts" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.36332476" />
     <property name="settings.editor.selected.configurable" value="reference.settingsdialog.project.gradle" />
   </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
-  </component>
   <component name="RunManager" selected="Gradle.Protein [fatJar]">
-    <configuration default="true" type="AndroidJUnit">
-      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="Protein [build]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -522,10 +218,10 @@
       </method>
     </configuration>
     <list>
+      <item itemvalue="Gradle.Protein [build]" />
       <item itemvalue="Gradle.Protein [clean]" />
       <item itemvalue="Gradle.Protein [fatJar]" />
       <item itemvalue="Gradle.Protein [jar]" />
-      <item itemvalue="Gradle.Protein [build]" />
       <item itemvalue="JUnit.KotlinApiBuilderShould.createInterfaceIfJuvoSchemaFileProvided" />
       <item itemvalue="Plugin.Unnamed" />
     </list>
@@ -549,6 +245,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1548414356886</updated>
+      <workItem from="1584719984160" duration="1837000" />
     </task>
     <servers />
   </component>
@@ -593,39 +290,8 @@
       <is-autoscroll-to-source value="true" />
     </todo-panel>
   </component>
-  <component name="ToolWindowManager">
-    <frame x="1912" y="-8" width="1936" height="1176" extended-state="6" />
-    <editor active="true" />
-    <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.18336888" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info id="Image Layers" order="2" />
-      <window_info id="Designer" order="3" />
-      <window_info id="Capture Tool" order="4" />
-      <window_info id="UI Designer" order="5" />
-      <window_info id="Favorites" order="6" side_tool="true" />
-      <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" sideWeight="0.49840087" weight="0.32694152" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.4989339" weight="0.30393097" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.4978678" weight="0.39980826" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.4989339" weight="0.32981783" />
-      <window_info anchor="bottom" id="Version Control" order="7" sideWeight="0.4989339" weight="0.32981783" />
-      <window_info anchor="bottom" id="Terminal" order="8" sideWeight="0.49733475" weight="0.32981783" />
-      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.5026652" side_tool="true" weight="0.32981783" />
-      <window_info anchor="bottom" id="Build" order="10" sideWeight="0.49840087" weight="0.32981783" />
-      <window_info anchor="bottom" id="Messages" order="11" sideWeight="0.49946696" weight="0.32981783" />
-      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
-      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" id="Palette" order="3" />
-      <window_info anchor="right" id="Maven" order="4" />
-      <window_info anchor="right" id="Gradle" order="5" weight="0.32995737" />
-      <window_info anchor="right" id="Theme Preview" order="6" />
-      <window_info anchor="right" id="Capture Analysis" order="7" />
-      <window_info anchor="right" id="Palette&#9;" order="8" />
-    </layout>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
   </component>
   <component name="Vcs.Log.History.Properties">
     <option name="COLUMN_ORDER">
@@ -643,20 +309,7 @@
         <entry key="MAIN">
           <value>
             <State>
-              <option name="RECENTLY_FILTERED_USER_GROUPS">
-                <collection />
-              </option>
-              <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
-                <collection />
-              </option>
-              <option name="COLUMN_ORDER">
-                <list>
-                  <option value="0" />
-                  <option value="1" />
-                  <option value="2" />
-                  <option value="3" />
-                </list>
-              </option>
+              <option name="COLUMN_ORDER" />
             </State>
           </value>
         </entry>
@@ -677,43 +330,64 @@
       </map>
     </option>
   </component>
+  <component name="WindowStateProjectService">
+    <state width="1807" height="664" key="GridCell.Tab.0.bottom" timestamp="1583855924845">
+      <screen x="67" y="27" width="1853" height="1173" />
+    </state>
+    <state width="1807" height="664" key="GridCell.Tab.0.bottom/67.27.1853.1173/1920.0.1920.1200@67.27.1853.1173" timestamp="1583855924845" />
+    <state width="1807" height="664" key="GridCell.Tab.0.center" timestamp="1583855924845">
+      <screen x="67" y="27" width="1853" height="1173" />
+    </state>
+    <state width="1807" height="664" key="GridCell.Tab.0.center/67.27.1853.1173/1920.0.1920.1200@67.27.1853.1173" timestamp="1583855924845" />
+    <state width="1807" height="664" key="GridCell.Tab.0.left" timestamp="1583855924845">
+      <screen x="67" y="27" width="1853" height="1173" />
+    </state>
+    <state width="1807" height="664" key="GridCell.Tab.0.left/67.27.1853.1173/1920.0.1920.1200@67.27.1853.1173" timestamp="1583855924845" />
+    <state width="1807" height="664" key="GridCell.Tab.0.right" timestamp="1583855924845">
+      <screen x="67" y="27" width="1853" height="1173" />
+    </state>
+    <state width="1807" height="664" key="GridCell.Tab.0.right/67.27.1853.1173/1920.0.1920.1200@67.27.1853.1173" timestamp="1583855924845" />
+    <state x="649" y="398" key="com.intellij.ide.util.TipDialog" timestamp="1584720008021">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state x="649" y="398" key="com.intellij.ide.util.TipDialog/67.27.1853.1053@67.27.1853.1053" timestamp="1584720008021" />
+    <state x="649" y="440" key="com.intellij.ide.util.TipDialog/67.27.1853.1173/1920.0.1920.1200@67.27.1853.1173" timestamp="1583852284674" />
+    <state x="656" y="287" width="672" height="678" key="search.everywhere.popup" timestamp="1583863137769">
+      <screen x="67" y="27" width="1853" height="1173" />
+    </state>
+    <state x="656" y="287" width="672" height="678" key="search.everywhere.popup/67.27.1853.1173/1920.0.1920.1200@67.27.1853.1173" timestamp="1583863137769" />
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.swagger/swagger-parser/1.0.33/f6d9fdece416d0bb97f58c0d4fae209fbe151d57/swagger-parser-1.0.33-sources.jar!/io/swagger/parser/SwaggerParser.java</url>
           <line>85</line>
-          <properties />
           <option name="timeStamp" value="3" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.swagger/swagger-parser/1.0.33/f6d9fdece416d0bb97f58c0d4fae209fbe151d57/swagger-parser-1.0.33-sources.jar!/io/swagger/parser/SwaggerParser.java</url>
           <line>57</line>
-          <properties />
           <option name="timeStamp" value="4" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.swagger/swagger-parser/1.0.33/f6d9fdece416d0bb97f58c0d4fae209fbe151d57/swagger-parser-1.0.33-sources.jar!/io/swagger/parser/Swagger20Parser.java</url>
           <line>85</line>
-          <properties />
           <option name="timeStamp" value="5" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.swagger/swagger-parser/1.0.33/f6d9fdece416d0bb97f58c0d4fae209fbe151d57/swagger-parser-1.0.33-sources.jar!/io/swagger/parser/Swagger20Parser.java</url>
           <line>83</line>
-          <properties />
           <option name="timeStamp" value="6" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.swagger/swagger-parser/1.0.33/f6d9fdece416d0bb97f58c0d4fae209fbe151d57/swagger-parser-1.0.33-sources.jar!/io/swagger/parser/Swagger20Parser.java</url>
           <line>114</line>
-          <properties />
           <option name="timeStamp" value="7" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
           <url>file://$PROJECT_DIR$/src/main/kotlin/protein/kotlinbuilders/KotlinApiBuilder.kt</url>
-          <line>1208</line>
-          <properties />
+          <line>1214</line>
           <option name="timeStamp" value="64" />
         </line-breakpoint>
       </breakpoints>
@@ -772,174 +446,6 @@
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
     </expressions>
-  </component>
-  <component name="editorHistoryManager">
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.swagger.parser.v3/swagger-parser-v3/2.0.12/f1dce63a3a52819f6d05237baf077fde004dff6f/swagger-parser-v3-2.0.12-sources.jar!/io/swagger/v3/parser/processors/SchemaProcessor.java" />
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.swagger.core.v3/swagger-models/2.0.8/aab943d2941dacc7f07618387110ff7b871bb159/swagger-models-2.0.8-sources.jar!/io/swagger/v3/oas/models/media/NumberSchema.java" />
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.swagger/swagger-models/1.5.22/57861cc38afd0f399aaa7741b9a2e2580687af3d/swagger-models-1.5.22-sources.jar!/io/swagger/models/parameters/BodyParameter.java" />
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.swagger.core.v3/swagger-models/2.0.8/aab943d2941dacc7f07618387110ff7b871bb159/swagger-models-2.0.8-sources.jar!/io/swagger/v3/oas/models/media/ObjectSchema.java" />
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/183.4588.61/1ccb336a53062ca972c07d4677234dbd0783e595/ideaIC-183.4588.61/lib/slf4j-api-1.7.25.jar!/org/slf4j/ILoggerFactory.class" />
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/183.4588.61/1ccb336a53062ca972c07d4677234dbd0783e595/ideaIC-183.4588.61/lib/slf4j-api-1.7.25.jar!/org/slf4j/Logger.class" />
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/1.7.25/962153db4a9ea71b79d047dfd1b2a0d80d8f4739/slf4j-api-1.7.25-sources.jar!/org/slf4j/ILoggerFactory.java" />
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/1.7.25/962153db4a9ea71b79d047dfd1b2a0d80d8f4739/slf4j-api-1.7.25-sources.jar!/org/slf4j/Logger.java" />
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.swagger/swagger-models/1.5.22/57861cc38afd0f399aaa7741b9a2e2580687af3d/swagger-models-1.5.22-sources.jar!/io/swagger/models/Response.java" />
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.swagger.parser.v3/swagger-parser-v3/2.0.12/f1dce63a3a52819f6d05237baf077fde004dff6f/swagger-parser-v3-2.0.12-sources.jar!/io/swagger/v3/parser/OpenAPIV3Parser.java" />
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.bugsnag/bugsnag/3.5.0/8e23aef793ff1ffc5e7f005e8e02beb3ef2e51c4/bugsnag-3.5.0-sources.jar!/com/bugsnag/Bugsnag.java" />
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/1.7.25/962153db4a9ea71b79d047dfd1b2a0d80d8f4739/slf4j-api-1.7.25-sources.jar!/org/slf4j/LoggerFactory.java" />
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.squareup/kotlinpoet/1.0.0-RC2/dcfb724ff7d15f285c6cc77a3f57481fcd27546d/kotlinpoet-1.0.0-RC2-sources.jar!/com/squareup/kotlinpoet/TypeName.kt" />
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.squareup/kotlinpoet/1.0.0-RC2/dcfb724ff7d15f285c6cc77a3f57481fcd27546d/kotlinpoet-1.0.0-RC2-sources.jar!/com/squareup/kotlinpoet/ClassName.kt" />
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.squareup/kotlinpoet/1.0.0-RC2/dcfb724ff7d15f285c6cc77a3f57481fcd27546d/kotlinpoet-1.0.0-RC2-sources.jar!/com/squareup/kotlinpoet/ParameterizedTypeName.kt" />
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.swagger.core.v3/swagger-models/2.0.8/aab943d2941dacc7f07618387110ff7b871bb159/swagger-models-2.0.8-sources.jar!/io/swagger/v3/oas/models/media/ArraySchema.java" />
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.swagger.core.v3/swagger-models/2.0.8/aab943d2941dacc7f07618387110ff7b871bb159/swagger-models-2.0.8-sources.jar!/io/swagger/v3/oas/models/media/IntegerSchema.java" />
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.swagger.core.v3/swagger-models/2.0.8/aab943d2941dacc7f07618387110ff7b871bb159/swagger-models-2.0.8-sources.jar!/io/swagger/v3/oas/models/media/StringSchema.java" />
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/183.4588.61/1ccb336a53062ca972c07d4677234dbd0783e595/ideaIC-183.4588.61/lib/slf4j-log4j12-1.7.25.jar!/org/slf4j/impl/StaticLoggerBinder.class" />
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.squareup/kotlinpoet/1.0.0-RC2/dcfb724ff7d15f285c6cc77a3f57481fcd27546d/kotlinpoet-1.0.0-RC2-sources.jar!/com/squareup/kotlinpoet/TypeVariableName.kt" />
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.squareup/kotlinpoet/1.0.0-RC2/dcfb724ff7d15f285c6cc77a3f57481fcd27546d/kotlinpoet-1.0.0-RC2-sources.jar!/com/squareup/kotlinpoet/PropertySpec.kt" />
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.swagger.core.v3/swagger-models/2.0.8/aab943d2941dacc7f07618387110ff7b871bb159/swagger-models-2.0.8-sources.jar!/io/swagger/v3/oas/models/media/Schema.java" />
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/183.4588.61/1ccb336a53062ca972c07d4677234dbd0783e595/ideaIC-183.4588.61/lib/junit-4.12.jar!/org/junit/runners/model/FrameworkMethod.class" />
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.squareup/kotlinpoet/1.0.0-RC2/dcfb724ff7d15f285c6cc77a3f57481fcd27546d/kotlinpoet-1.0.0-RC2-sources.jar!/com/squareup/kotlinpoet/TypeSpec.kt" />
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.squareup/kotlinpoet/1.0.0-RC2/e2b1331da63dff4701cd523ab6ea2f3aadac1e71/kotlinpoet-1.0.0-RC2.jar!/com/squareup/kotlinpoet/CodeBlock.class" />
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.squareup/kotlinpoet/1.0.0-RC2/e2b1331da63dff4701cd523ab6ea2f3aadac1e71/kotlinpoet-1.0.0-RC2.jar!/com/squareup/kotlinpoet/PropertySpec.class" />
-    <entry file="jar://C:/Program Files/Java/jdk1.8.0_201/src.zip!/java/lang/StringBuilder.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5872">
-          <caret line="404" column="18" selection-start-line="404" selection-start-column="18" selection-end-line="404" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.3.11/d46e00faac79f8ec6bb956154ecde4282871a6bf/kotlin-stdlib-1.3.11-sources.jar!/kotlin/text/StringsJVM.kt" />
-    <entry file="jar://C:/Program Files/Java/jdk1.8.0_201/src.zip!/java/lang/String.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="21968">
-          <caret line="1433" column="20" selection-start-line="1433" selection-start-column="20" selection-end-line="1433" selection-end-column="20" />
-          <folding>
-            <element signature="e#55800#55801#0" expanded="true" />
-            <element signature="e#55844#55845#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/protein/common/SettingsManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
-          <caret line="28" column="9" selection-start-line="28" selection-start-column="9" selection-end-line="28" selection-end-column="9" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.3.11/4cbc5922a54376018307a731162ccaf3ef851a39/kotlin-stdlib-1.3.11.jar!/kotlin/collections/CollectionsKt.class" />
-    <entry file="file://$PROJECT_DIR$/src/main/java/protein/steps/ModuleSelectorStep.form">
-      <provider selected="true" editor-type-id="ui-designer" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/protein/steps/PackageInfoStep.form">
-      <provider selected="true" editor-type-id="ui-designer" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CHANGELOG.md">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/resources/META-INF/plugin.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="512">
-          <caret line="50" column="31" selection-start-line="50" selection-start-column="31" selection-end-line="50" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/gradle.plugin.org.jetbrains.intellij.plugins/gradle-intellij-plugin/0.3.4/a8ff8ba9d9309f6df33cd39e721b063094e1b321/gradle-intellij-plugin-0.3.4-sources.jar!/org/jetbrains/intellij/IntelliJPluginExtension.groovy" />
-    <entry file="file://$PROJECT_DIR$/.editorconfig">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.travis.yml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-93" />
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.swagger.parser.v3/swagger-parser-v3/2.0.12/f1dce63a3a52819f6d05237baf077fde004dff6f/swagger-parser-v3-2.0.12-sources.jar!/io/swagger/v3/parser/util/RefUtils.java" />
-    <entry file="file://$PROJECT_DIR$/Protein.ipr">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/kotlin/protein/kotlinbuilders/KotlinApiBuilder.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="833">
-          <caret line="998" lean-forward="true" selection-start-line="998" selection-end-line="998" />
-          <folding>
-            <element signature="e#32#2307#0" expanded="true" />
-            <element signature="e#4715#5561#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/kotlin/protein/kotlinbuilders/ProteinApiConfiguration.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="32">
-          <caret line="2" column="23" selection-start-line="2" selection-start-column="23" selection-end-line="2" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/protein/steps/PackageInfoStep.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1936">
-          <caret line="141" column="46" selection-start-line="141" selection-start-column="46" selection-end-line="141" selection-end-column="46" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/protein/common/Settings.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="736">
-          <caret line="69" column="22" selection-start-line="69" selection-start-column="22" selection-end-line="69" selection-end-column="22" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#1558#1559#0" expanded="true" />
-            <element signature="e#1636#1637#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Protein.iws">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="256">
-          <caret line="16" column="45" selection-start-line="16" selection-start-column="45" selection-end-line="16" selection-end-column="45" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Protein.iml">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/kotlin/protein/AddComponentWizard.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="400">
-          <caret line="28" selection-start-line="28" selection-end-line="28" />
-          <folding>
-            <element signature="e#17#120#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/build.gradle">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="720">
-          <caret line="45" column="4" selection-start-line="45" selection-start-column="4" selection-end-line="45" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/version.properties">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="32">
-          <caret line="2" column="7" selection-start-line="2" selection-start-column="7" selection-end-line="2" selection-end-column="7" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/protein/common/StorageUtils.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="512">
-          <caret line="49" column="25" selection-start-line="49" selection-start-column="25" selection-end-line="49" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
   </component>
   <component name="masterDetails">
     <states>

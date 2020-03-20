@@ -993,6 +993,12 @@ class KotlinApiBuilder(
             "ReceiptFrom" -> "Receipt"
             "HeadOfficeCompany", "CompanyRegister" -> "Company"
             "OrderOriginatedFrom" -> "Order"
+            "CompanyBirthRegistryOffice" -> "Company"
+            "CompanyDeathPlaceRegistryOffice" -> "Company"
+            "AddresOfDeath" -> "Company"
+            "CompanyChurch" -> "Company"
+            "PersonGroupContact" -> "PersonGroup"
+
             else -> field
         }
     }
