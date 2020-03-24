@@ -968,7 +968,7 @@ class KotlinApiBuilder(
 
     private fun resolveEntityNameMatch(field: String, entity: String): String {
         return when (field) {
-            "ContactPersonGroup" -> "PersonGroup"
+            "PersonGroupContact" -> "PersonGroup"
             "ReportTemplate" -> "Report"
             "Payer" -> "Contact"
             else -> resolveMapHelperMatch(field, entity)
