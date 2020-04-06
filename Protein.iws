@@ -243,7 +243,8 @@
       <updated>1548414356886</updated>
       <workItem from="1584719984160" duration="3193000" />
       <workItem from="1585076695109" duration="414000" />
-      <workItem from="1585077903543" duration="1426000" />
+      <workItem from="1585077903543" duration="1525000" />
+      <workItem from="1586185240985" duration="6721000" />
     </task>
     <servers />
   </component>
@@ -349,14 +350,16 @@
     </state>
     <state width="1797" height="278" key="GridCell.Tab.0.right/67.27.1853.1053@67.27.1853.1053" timestamp="1585077108487" />
     <state width="1807" height="664" key="GridCell.Tab.0.right/67.27.1853.1173/1920.0.1920.1200@67.27.1853.1173" timestamp="1583855924845" />
-    <state x="649" y="398" key="com.intellij.ide.util.TipDialog" timestamp="1585077903036">
-      <screen x="67" y="27" width="1853" height="1053" />
+    <state x="603" y="398" key="com.intellij.ide.util.TipDialog" timestamp="1586185309978">
+      <screen x="0" y="27" width="1920" height="1053" />
     </state>
+    <state x="603" y="398" key="com.intellij.ide.util.TipDialog/1920.0.1920.1080/0.27.1920.1053@0.27.1920.1053" timestamp="1586185309978" />
     <state x="649" y="398" key="com.intellij.ide.util.TipDialog/67.27.1853.1053@67.27.1853.1053" timestamp="1585077903036" />
     <state x="649" y="440" key="com.intellij.ide.util.TipDialog/67.27.1853.1173/1920.0.1920.1200@67.27.1853.1173" timestamp="1583852284674" />
-    <state x="636" y="163" width="710" height="780" key="find.popup" timestamp="1585078564110">
-      <screen x="67" y="27" width="1853" height="1053" />
+    <state x="590" y="163" width="736" height="780" key="find.popup" timestamp="1586187793557">
+      <screen x="0" y="27" width="1920" height="1053" />
     </state>
+    <state x="590" y="163" width="736" height="780" key="find.popup/1920.0.1920.1080/0.27.1920.1053@0.27.1920.1053" timestamp="1586187793557" />
     <state x="636" y="163" width="710" height="780" key="find.popup/67.27.1853.1053@67.27.1853.1053" timestamp="1585078564110" />
     <state x="656" y="287" width="672" height="678" key="search.everywhere.popup" timestamp="1583863137769">
       <screen x="67" y="27" width="1853" height="1173" />
@@ -393,7 +396,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
           <url>file://$PROJECT_DIR$/src/main/kotlin/protein/kotlinbuilders/KotlinApiBuilder.kt</url>
-          <line>1214</line>
+          <line>1216</line>
           <option name="timeStamp" value="64" />
         </line-breakpoint>
       </breakpoints>

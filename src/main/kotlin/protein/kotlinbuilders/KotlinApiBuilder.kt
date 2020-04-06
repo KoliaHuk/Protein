@@ -1007,6 +1007,8 @@ class KotlinApiBuilder(
         name == "SyncData"
             || name == "SyncMap"
             || name == "PermissionSyncInfo"
+            || name == "OrderCopyConfig"
+            || name == "OrderConfig"
 
     private fun createPutMapHelper(packageName: String) {
         val ttt = ClassName("", "MutableSet")
